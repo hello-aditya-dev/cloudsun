@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, Send, Sparkles } from "lucide-react";
-import { generateDemoAIResponse } from "@/lib/demo-ai";
+import { generateDentalAIResponse } from "@/lib/demo-ai";
 
 export default function OnboardingTestPage() {
   const [input, setInput] = useState("");
@@ -22,7 +22,7 @@ export default function OnboardingTestPage() {
     setInput("");
     setLoading(true);
     setTimeout(() => {
-      const ai = generateDemoAIResponse(userMsg.text, "phone", "New Caller");
+      const ai = generateDentalAIResponse(userMsg.text, "phone", "New Caller");
       setThread((t) => [...t, { who: "ai", text: ai.text, confidence: ai.confidence }]);
       setLoading(false);
     }, 1000);

@@ -19,7 +19,7 @@ import {
   demoConversations, demoContacts, demoAudit,
 } from "@/lib/repositories";
 import { useDemoState } from "@/hooks/use-demo-state";
-import { generateDemoAIResponse, rewriteText, shortenText, makeFriendlier, makeMoreFormal, translateText } from "@/lib/demo-ai";
+import { generateDentalAIResponse, rewriteText, shortenText, makeFriendlier, makeMoreFormal, translateText } from "@/lib/demo-ai";
 import {
   Search, Filter, Inbox as InboxIcon, Star, Clock, Bot, UserCheck,
   CheckCircle2, Moon, Archive, Ban as SpamIcon, Paperclip, Sparkles, Send,
@@ -117,7 +117,7 @@ export function InboxSection() {
     // Simulated AI auto-response for customer-facing replies (not notes)
     if (composerMode === "reply") {
       setTimeout(() => {
-        const ai = generateDemoAIResponse(composer, selectedConv.channel, selectedConv.contactName);
+        const ai = generateDentalAIResponse(composer, selectedConv.channel, selectedConv.contactName);
         const aiMsg: Message = {
           id: `m_${Date.now() + 1}`,
           conversationId: selectedConv.id,
@@ -150,7 +150,7 @@ export function InboxSection() {
     if (!selectedConv) return;
     setAiDrafting(true);
     setTimeout(() => {
-      const ai = generateDemoAIResponse(
+      const ai = generateDentalAIResponse(
         selectedConv.preview,
         selectedConv.channel,
         selectedConv.contactName,

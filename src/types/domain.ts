@@ -231,7 +231,7 @@ export interface Integration {
   id: ID;
   name: string;
   category: string;
-  status: "not_connected" | "connecting" | "connected" | "reauth" | "missing_perm" | "sync_delayed" | "error" | "disabled";
+  status: "demo" | "not_connected" | "connecting" | "connected" | "reauth" | "missing_perm" | "sync_delayed" | "error" | "disabled" | "planned";
   icon: string;
   lastSync?: ISODate;
 }

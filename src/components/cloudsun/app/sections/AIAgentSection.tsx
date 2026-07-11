@@ -13,7 +13,7 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { demoAIConfig } from "@/lib/repositories";
-import { generateDemoAIResponse } from "@/lib/demo-ai";
+import { generateDentalAIResponse } from "@/lib/demo-ai";
 import type { ChannelId } from "@/config/cloudsun";
 import {
   Sparkles, Bot, Phone, Mail, MessageCircle, MessageSquare, Shield,
@@ -472,7 +472,7 @@ function TestPlayground() {
     setInput("");
     setLoading(true);
     setTimeout(() => {
-      const ai = generateDemoAIResponse(userMsg.text, channel, "New Caller");
+      const ai = generateDentalAIResponse(userMsg.text, channel, "New Caller");
       setLastIntent(ai.intent);
       setLastCitations(ai.citations);
       setLastToolCall(ai.toolCall ?? null);

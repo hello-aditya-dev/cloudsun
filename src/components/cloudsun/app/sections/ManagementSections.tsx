@@ -129,11 +129,13 @@ export function TeamSection() {
 /* --------------------------- INTEGRATIONS ------------------------------ */
 export function IntegrationsSection() {
   const [filter, setFilter] = useState("all");
-  const cats = ["all", "Communication", "Calendar", "Meetings", "CRM", "Automation", "Storage"];
+  const cats = ["all", "Practice Management", "Communication", "Calendar", "Meetings", "Payments", "Automation"];
   const filtered = filter === "all" ? integrationCatalog : integrationCatalog.filter((i) => i.category === filter);
 
   const statusMeta: Record<string, { color: string; label: string; icon: typeof CheckCircle2 }> = {
     connected: { color: "oklch(0.45 0.08 155)", label: "Connected", icon: CheckCircle2 },
+    demo: { color: "oklch(0.70 0.12 75)", label: "Interactive demo", icon: CheckCircle2 },
+    planned: { color: "oklch(0.65 0.05 250)", label: "Planned", icon: Clock },
     sync_delayed: { color: "oklch(0.70 0.12 75)", label: "Sync delayed", icon: Clock },
     reauth: { color: "oklch(0.62 0.16 42)", label: "Reauthorization required", icon: AlertTriangle },
     error: { color: "oklch(0.62 0.16 42)", label: "Error", icon: XCircle },
@@ -164,8 +166,8 @@ export function IntegrationsSection() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((item) => {
           const integ = integrations.find((i) => i.name.includes(item.name)) ?? integrations.find((i) => i.name === item.name);
-          const status = integ?.status ?? "not_connected";
-          const meta = statusMeta[status];
+          const status = integ?.status ?? item.status ?? "not_connected";
+          const meta = statusMeta[status] ?? statusMeta.not_connected;
           const StatusIcon = meta.icon;
           return (
             <Card key={item.name} className="border-border bg-card transition-all hover:shadow-soft">
