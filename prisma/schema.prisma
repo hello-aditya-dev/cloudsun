@@ -1,32 +1,470 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// CloudSun — production Prisma schema (PostgreSQL).
+// The frontend runs in demo mode without a database. This schema is the
+// production target for when real persistence is enabled.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// ─── Workspace & membership ──────────────────────────────────────────────────
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  plan        String   @default("Starter")
+  timezone    String   @default("UTC")
+  demoMode    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  memberships WorkspaceMembership[]
+  teams       Team[]
+  contacts    Contact[]
+  companies   Company[]
+  conversations Conversation[]
+  calls       Call[]
+  appointments Appointment[]
+  knowledgeSources KnowledgeSource[]
+  automations Automation[]
+  integrations Integration[]
+  aiConfigurations AIConfiguration[]
+  auditLogs   AuditLog[]
+  usageRecords UsageRecord[]
+  notifications Notification[]
 }
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model WorkspaceMembership {
+  id          String   @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        String   @default("agent") // owner | administrator | manager | agent | analyst | read_only
+  createdAt   DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  memberships   WorkspaceMembership[]
+  teamMembers   TeamMember[]
+}
+
+// ─── Team ────────────────────────────────────────────────────────────────────
+
+model Team {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  createdAt   DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  userId      String
+  teamId      String
+  workspaceId String
+  skills      String[]
+  languages   String[]
+  department  String?
+  availability String  @default("offline") // available | busy | away | offline
+  callAvailable Boolean @default(false)
+  createdAt   DateTime @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+// ─── Contacts & companies ───────────────────────────────────────────────────
+
+model Company {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  website     String?
+  industry    String?
+  estimatedValue Int?
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  contacts    Contact[]
+}
+
+model Contact {
+  id            String   @id @default(cuid())
+  workspaceId   String
+  name          String
+  primaryChannel String  @default("phone")
+  leadStage     String   @default("new") // new | qualified | opportunity | customer | churned | spam
+  ownerId       String?
+  sentiment     String   @default("unknown")
+  tags          String[]
+  notes         String?
+  aiSummary     String?
+  consentRecorded Boolean @default(false)
+  consentMarketing Boolean @default(false)
+  lastInteraction DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  company       Company?  @relation(fields: [companyId], references: [id])
+  companyId     String?
+  identities    ContactIdentity[]
+  conversations Conversation[]
+  calls         Call[]
+  appointments  Appointment[]
+}
+
+model ContactIdentity {
+  id          String   @id @default(cuid())
+  contactId   String
+  channel     String   // phone | email | whatsapp | webchat
+  handle      String
+  verified    Boolean  @default(false)
+
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, channel, handle])
+}
+
+// ─── Conversations & messages ───────────────────────────────────────────────
+
+model Conversation {
+  id            String   @id @default(cuid())
+  workspaceId   String
+  contactId     String
+  channel       String
+  subject       String
+  preview       String
+  status        String   @default("open") // open | unassigned | mine | waiting | ai_handling | needs_approval | snoozed | closed | spam
+  priority      String   @default("normal")
+  assigneeId    String?
+  aiHandling    Boolean  @default(false)
+  slaMinutes    Int      @default(60)
+  slaBreached   Boolean  @default(false)
+  unread        Int      @default(0)
+  sentiment     String   @default("unknown")
+  aiConfidence  Float?
+  lastAt        DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  contact       Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  messages      Message[]
+  attachments   Attachment[]
+  handoffs      Handoff[]
+}
+
+model Message {
+  id            String   @id @default(cuid())
+  conversationId String
+  author        String   // customer | ai | human | system
+  authorName    String
+  channel       String
+  body          String
+  aiConfidence  Float?
+  status        String?  // sent | delivered | read | failed
+  kind          String   @default("message") // message | note | event | appointment | handoff
+  createdAt     DateTime @default(now())
+
+  conversation  Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  attachments   Attachment[]
+}
+
+model Attachment {
+  id            String   @id @default(cuid())
+  conversationId String
+  messageId     String?
+  name          String
+  kind          String
+  size          Int?
+  url           String?
+  createdAt     DateTime @default(now())
+
+  conversation  Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message       Message?     @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+// ─── Calls ───────────────────────────────────────────────────────────────────
+
+model Call {
+  id            String   @id @default(cuid())
+  workspaceId   String
+  contactId     String
+  phone         String
+  direction     String   // incoming | outgoing | missed | voicemail
+  status        String   // live | completed | transferred | failed | missed | voicemail
+  handler       String   // ai | human
+  agentId       String?
+  startedAt     DateTime @default(now())
+  durationSec   Int      @default(0)
+  outcome       String?
+  sentiment     String   @default("unknown")
+  hasRecording  Boolean  @default(false)
+  consent       Boolean  @default(false)
+  aiSummary     String?
+  topics        String[]
+  followUps     String[]
+  qualityFlags  String[]
+  createdAt     DateTime @default(now())
+
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  contact       Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  transcript    CallTranscriptSegment[]
+}
+
+model CallTranscriptSegment {
+  id          String   @id @default(cuid())
+  callId      String
+  speaker     String   // caller | ai | human
+  text        String
+  confidence  Float?
+  at          DateTime @default(now())
+
+  call        Call     @relation(fields: [callId], references: [id], onDelete: Cascade)
+}
+
+// ─── Appointments ───────────────────────────────────────────────────────────
+
+model Appointment {
+  id          String   @id @default(cuid())
+  workspaceId String
+  contactId   String
+  title       String
+  startAt     DateTime
+  endAt       DateTime
+  status      String   @default("scheduled") // scheduled | confirmed | completed | cancelled | no_show
+  source      String   // phone | email | whatsapp | webchat
+  assigneeId  String?
+  channel     String
+  timezone    String
+  type        String
+  location    String?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  contact     Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model AvailabilityRule {
+  id          String   @id @default(cuid())
+  workspaceId String
+  teamMemberId String?
+  dayOfWeek   Int
+  startTime   String
+  endTime     String
+  createdAt   DateTime @default(now())
+}
+
+// ─── Knowledge ──────────────────────────────────────────────────────────────
+
+model KnowledgeSource {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  type        String   // website | sitemap | url | pdf | document | text | faq | notion | drive | manual
+  status      String   @default("synced") // synced | syncing | error | paused | draft
+  lastSync    DateTime?
+  records     Int      @default(0)
+  errors      Int?
+  owner       String
+  channels    String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  documents   KnowledgeDocument[]
+}
+
+model KnowledgeDocument {
+  id          String   @id @default(cuid())
+  sourceId    String
+  title       String
+  content     String
+  url         String?
+  createdAt   DateTime @default(now())
+
+  source      KnowledgeSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+}
+
+// ─── AI configuration ───────────────────────────────────────────────────────
+
+model AIConfiguration {
+  id          String   @id @default(cuid())
+  workspaceId String
+  agentName   String
+  role        String
+  businessName String
+  greeting    String
+  closing     String?
+  tone        String   @default("warm")
+  formality   String   @default("balanced")
+  languages   String[]
+  pronunciationDict Json?
+  minConfidence Float  @default(0.7)
+  sentimentThreshold Float @default(0.35)
+  maxFailedAttempts Int @default(2)
+  voice       String   @default("aria")
+  speakingSpeed String @default("1")
+  warmth      Int      @default(70)
+  expressiveness Int   @default(50)
+  interruptionSensitivity Int @default(80)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  versions    AIVersion[]
+  actions     AIAction[]
+}
+
+model AIVersion {
+  id            String   @id @default(cuid())
+  configurationId String
+  snapshot      Json
+  publishedAt   DateTime?
+  createdAt     DateTime @default(now())
+
+  configuration AIConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+}
+
+model AIAction {
+  id            String   @id @default(cuid())
+  configurationId String
+  action        String
+  resource      String
+  result        String   // success | failure | warning
+  confidence    Float?
+  details       String?
+  at            DateTime @default(now())
+
+  configuration AIConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+}
+
+model Handoff {
+  id            String   @id @default(cuid())
+  conversationId String
+  fromHandler   String   // ai | human
+  toHandler     String?
+  reason        String?
+  at            DateTime @default(now())
+
+  conversation  Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+// ─── Automations ────────────────────────────────────────────────────────────
+
+model Automation {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  description String
+  status      String   @default("enabled") // enabled | disabled | draft
+  trigger     String
+  runs        Int      @default(0)
+  lastRun     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  steps       AutomationStep[]
+  runs_log    AutomationRun[]
+}
+
+model AutomationStep {
+  id          String   @id @default(cuid())
+  automationId String
+  kind        String   // trigger | condition | ai | action | delay | branch | approval | test
+  label       String
+  config      Json?
+  order       Int
+
+  automation  Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+}
+
+model AutomationRun {
+  id          String   @id @default(cuid())
+  automationId String
+  status      String   // success | failure | warning
+  details     String?
+  at          DateTime @default(now())
+
+  automation  Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+}
+
+// ─── Integrations ───────────────────────────────────────────────────────────
+
+model Integration {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  category    String
+  status      String   @default("not_connected") // not_connected | connecting | connected | reauthorization_required | sync_delayed | error | disabled
+  icon        String
+  lastSync    DateTime?
+  config      Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+// ─── Usage, notifications, audit ────────────────────────────────────────────
+
+model UsageRecord {
+  id          String   @id @default(cuid())
+  workspaceId String
+  category    String   // phone | ai_usage | whatsapp | storage
+  amount      Int
+  period      String   // YYYY-MM
+  createdAt   DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  workspaceId String
+  type        String
+  title       String
+  body        String?
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  workspaceId String
+  actor       String
+  actorType   String   // human | ai | system
+  action      String
+  resource    String
+  result      String   // success | failure | warning
+  ip          String?
+  details     String?
+  at          DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
