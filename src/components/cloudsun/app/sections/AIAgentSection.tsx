@@ -12,6 +12,9 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { demoAIConfig } from "@/lib/repositories";
+import { generateDemoAIResponse } from "@/lib/demo-ai";
+import type { ChannelId } from "@/config/cloudsun";
 import {
   Sparkles, Bot, Phone, Mail, MessageCircle, MessageSquare, Shield,
   CheckCircle2, AlertTriangle, Send, Loader2, Volume2, Save, Eye,
@@ -42,8 +45,17 @@ const permLevels = [
 
 export function AIAgentSection() {
   const [tab, setTab] = useState("identity");
-  const [confidence, setConfidence] = useState([70]);
-  const [sentiment, setSentiment] = useState([35]);
+  const config = demoAIConfig.get();
+  const [confidence, setConfidence] = useState([config.minConfidence]);
+  const [sentiment, setSentiment] = useState([config.sentimentThreshold]);
+
+  function saveConfig() {
+    demoAIConfig.update({ minConfidence: confidence[0], sentimentThreshold: sentiment[0] });
+  }
+  function publishConfig() {
+    demoAIConfig.update({ minConfidence: confidence[0], sentimentThreshold: sentiment[0] });
+    demoAIConfig.publish();
+  }
 
   return (
     <SectionScroll>
@@ -52,8 +64,8 @@ export function AIAgentSection() {
         subtitle="The control centre for your AI receptionist. Configure identity, behaviour, permissions and voice."
         action={
           <div className="flex gap-2">
-            <Button variant="outline" size="sm"><Eye className="h-3.5 w-3.5" /> Preview draft</Button>
-            <Button size="sm"><Save className="h-3.5 w-3.5" /> Publish</Button>
+            <Button variant="outline" size="sm" onClick={saveConfig}><Save className="h-3.5 w-3.5" /> Save draft</Button>
+            <Button size="sm" onClick={publishConfig}><Save className="h-3.5 w-3.5" /> Publish</Button>
           </div>
         }
       />
@@ -440,11 +452,17 @@ export function AIAgentSection() {
 }
 
 function TestPlayground() {
-  const [channel, setChannel] = useState("phone");
+  const aiConfig = demoAIConfig.get();
+  const [channel, setChannel] = useState<ChannelId>("phone");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [thread, setThread] = useState<{ who: "user" | "ai"; text: string; confidence?: number }[]>([
-    { who: "ai", text: "Thank you for calling Atelier North, this is Sunny. How can I help you today?", confidence: 0.95 },
+  const [lastIntent, setLastIntent] = useState<string | null>(null);
+  const [lastCitations, setLastCitations] = useState<string[]>([]);
+  const [lastToolCall, setLastToolCall] = useState<string | null>(null);
+  const [lastApproval, setLastApproval] = useState(false);
+  const [lastHandoff, setLastHandoff] = useState(false);
+  const [thread, setThread] = useState<{ who: "user" | "ai"; text: string; confidence?: number; intent?: string }[]>([
+    { who: "ai", text: aiConfig.greeting, confidence: 0.95 },
   ]);
 
   function send() {
@@ -454,13 +472,20 @@ function TestPlayground() {
     setInput("");
     setLoading(true);
     setTimeout(() => {
+      const ai = generateDemoAIResponse(userMsg.text, channel, "New Caller");
+      setLastIntent(ai.intent);
+      setLastCitations(ai.citations);
+      setLastToolCall(ai.toolCall ?? null);
+      setLastApproval(ai.approvalRequired);
+      setLastHandoff(ai.handoff);
       setThread((t) => [...t, {
         who: "ai",
-        text: "Of course — let me check Amara's calendar. She has Thursday at 11:00 or Friday at 15:00 available. Which works better for you?",
-        confidence: 0.88,
+        text: ai.text,
+        confidence: ai.confidence,
+        intent: ai.intent,
       }]);
       setLoading(false);
-    }, 1200);
+    }, 1000);
   }
 
   return (
@@ -469,12 +494,12 @@ function TestPlayground() {
         <CardContent className="p-5">
           <div className="mb-4 flex items-center gap-2">
             <div className="flex gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
-              {[
+              {([
                 { id: "phone", label: "Phone" },
                 { id: "whatsapp", label: "WhatsApp" },
                 { id: "email", label: "Email" },
                 { id: "webchat", label: "Web chat" },
-              ].map((c) => (
+              ] as { id: ChannelId; label: string }[]).map((c) => (
                 <button
                   key={c.id}
                   onClick={() => setChannel(c.id)}
@@ -484,16 +509,19 @@ function TestPlayground() {
                 </button>
               ))}
             </div>
-            <Badge variant="outline" className="text-[10px]">Draft v4</Badge>
+            <Badge variant="outline" className="text-[10px]">Draft v{aiConfig.draftVersion}</Badge>
+            <Badge variant="outline" className="text-[10px] gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.70_0.12_75)]" /> Simulated
+            </Badge>
           </div>
 
           <div className="min-h-[280px] space-y-3 rounded-xl border border-border bg-muted/20 p-4">
             {thread.map((m, i) => (
               <div key={i} className={`flex ${m.who === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm ${m.who === "user" ? "rounded-tr-md bg-primary text-primary-foreground" : "rounded-tl-md bg-card shadow-soft"}`}>
-                  <div className="mb-0.5 text-[10px] opacity-70">{m.who === "user" ? "You" : "Sunny (AI)"}</div>
+                  <div className="mb-0.5 text-[10px] opacity-70">{m.who === "user" ? "You" : `${aiConfig.agentName} (AI, simulated)`}</div>
                   {m.text}
-                  {m.confidence && <div className="mt-1 text-[9px] opacity-60">confidence {Math.round(m.confidence * 100)}%</div>}
+                  {m.confidence && <div className="mt-1 text-[9px] opacity-60">confidence {Math.round(m.confidence * 100)}%{m.intent ? ` · intent: ${m.intent}` : ""}</div>}
                 </div>
               </div>
             ))}
@@ -530,30 +558,48 @@ function TestPlayground() {
         <Card className="border-border bg-card">
           <CardContent className="p-5">
             <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5" /> Detected intent
+            </div>
+            {lastIntent ? (
+              <div className="space-y-1.5 text-xs">
+                <div className="flex justify-between"><span className="text-muted-foreground">Intent</span><span className="font-medium capitalize">{lastIntent.replace("_", " ")}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Approval required</span><span>{lastApproval ? "Yes" : "No"}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Handoff</span><span>{lastHandoff ? "Yes" : "No"}</span></div>
+              </div>
+            ) : (
+              <div className="text-xs text-muted-foreground">Send a message to detect intent.</div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-border bg-card">
+          <CardContent className="p-5">
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <BookOpen className="h-3.5 w-3.5" /> Retrieved knowledge
             </div>
             <div className="space-y-2 text-xs">
-              {[
-                { src: "Services & pricing PDF", q: "consultation packages" },
-                { src: "FAQ", q: "first session length" },
-                { src: "Atelier North website", q: "studio location" },
-              ].map((k) => (
-                <div key={k.src} className="rounded-lg border border-border bg-muted/20 p-2.5">
-                  <div className="font-medium">{k.src}</div>
-                  <div className="text-[11px] text-muted-foreground">matched: &ldquo;{k.q}&rdquo;</div>
+              {lastCitations.length > 0 ? lastCitations.map((src) => (
+                <div key={src} className="rounded-lg border border-border bg-muted/20 p-2.5">
+                  <div className="font-medium">{src}</div>
+                  <div className="text-[11px] text-muted-foreground">cited in simulated response</div>
                 </div>
-              ))}
+              )) : (
+                <div className="text-xs text-muted-foreground">No citations yet.</div>
+              )}
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-border bg-card">
           <CardContent className="p-5">
-            <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tool calls</div>
+            <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Proposed tool call</div>
             <div className="space-y-1.5 text-xs">
-              <div className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-[oklch(0.45_0.08_155)]" /> read_calendar_availability</div>
-              <div className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-[oklch(0.45_0.08_155)]" /> identify_contact</div>
-              <div className="flex items-center gap-2 text-muted-foreground"><div className="h-3.5 w-3.5 rounded-full border-2 border-muted-foreground/30" /> book_appointment (pending)</div>
+              {lastToolCall ? (
+                <div className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-[oklch(0.45_0.08_155)]" /> {lastToolCall}</div>
+              ) : (
+                <div className="text-xs text-muted-foreground">No tool call proposed.</div>
+              )}
+              <div className="text-[10px] text-muted-foreground">Tool calls are simulated. Configure an AI provider in production.</div>
             </div>
           </CardContent>
         </Card>

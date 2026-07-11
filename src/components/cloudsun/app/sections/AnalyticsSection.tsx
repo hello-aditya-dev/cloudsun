@@ -185,7 +185,7 @@ export function AnalyticsSection() {
                 { label: "Qualified leads", value: "14", trend: "+3" },
                 { label: "Appointments booked", value: "56", trend: "+8" },
                 { label: "Appointment conversion", value: "42%", trend: "+2pts" },
-                { label: "Revenue influenced", value: "₹2.04L", trend: "+18%" },
+                { label: "Revenue influenced", value: "$204K", trend: "+18%" },
               ].map((m) => (
                 <div key={m.label} className="flex items-center justify-between border-b border-border/60 pb-2 text-xs last:border-0">
                   <span className="text-muted-foreground">{m.label}</span>
@@ -246,7 +246,7 @@ export function AnalyticsSection() {
             <div className="space-y-2 text-xs">
               {analytics.monthlyCost.map((c) => (
                 <div key={c.category}>
-                  <div className="flex justify-between"><span className="text-muted-foreground">{c.category}</span><span>₹{c.amount}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">{c.category}</span><span>${c.amount}</span></div>
                   <div className="mt-1 h-1 overflow-hidden rounded-full bg-muted">
                     <div className="h-full rounded-full bg-[oklch(0.62_0.16_42)]" style={{ width: `${(c.amount / 1240) * 100}%` }} />
                   </div>
@@ -254,8 +254,8 @@ export function AnalyticsSection() {
               ))}
             </div>
             <div className="mt-4 border-t border-border pt-3 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Cost / conversation</span><span className="font-medium">₹{analytics.costPerConversation}</span></div>
-              <div className="mt-1 flex justify-between"><span className="text-muted-foreground">Cost / appointment</span><span className="font-medium">₹{analytics.costPerAppointment}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Cost / conversation</span><span className="font-medium">${analytics.costPerConversation}</span></div>
+              <div className="mt-1 flex justify-between"><span className="text-muted-foreground">Cost / appointment</span><span className="font-medium">${analytics.costPerAppointment}</span></div>
             </div>
           </CardContent>
         </Card>

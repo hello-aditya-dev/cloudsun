@@ -4,102 +4,153 @@
 
 CloudSun is an omnichannel AI front desk and shared client inbox for phone calls, email, WhatsApp, website chat and appointment scheduling. A customer may begin through a phone call, continue over WhatsApp and later reply by email — CloudSun preserves those interactions as one continuous customer relationship.
 
-This repository contains the complete frontend product prototype: a marketing website, a guided onboarding flow, and a full application dashboard with a unified inbox, live-call workspace, lightweight CRM, calendar, AI front desk builder, knowledge base, automation builder, analytics, team management, integrations, settings, billing, security and audit log.
+**Repository:** [hello-aditya-dev/cloudsun](https://github.com/hello-aditya-dev/cloudsun)
 
-## Product positioning
+**Current state:** Interactive product prototype with real Next.js App Router routes, persistent demo state, and an honest demo-mode system. No real provider integrations are connected.
 
-CloudSun is designed for busy professional services — clinics, salons, studios, advisory firms — where the front desk is the difference between a booked client and a lost lead. It combines:
+---
 
-- A premium shared inbox across phone, email, WhatsApp and website chat
-- An AI receptionist that answers, transcribes, routes and books
-- A lightweight CRM built around conversations, not forms
-- A call-management system with live transcripts and after-call summaries
-- An appointment scheduler that reads real calendar availability
-- An automation platform with triggers, conditions, AI steps and approvals
-- A customer-intelligence dashboard with honest analytics
+## Product overview
 
-## Major features
+CloudSun combines:
 
-- **Unified inbox** — three-panel desktop layout with status filters, channel filters, search, message threads (customer / AI / human / internal note / system event), composer with AI draft, rewrite, schedule send and request approval, and a context panel with contact details, AI summary and suggested next action.
-- **Phone and call experience** — live-call workspace with transcript, waveform, AI listening / speaking / confidence indicators, mute / hold / transfer / add human / end controls, tool-activity feed, and after-call recording, summary, topics, follow-ups and quality flags.
-- **Contacts and CRM** — list with lead-stage filters, profile with connected identities, ownership, AI summary, unified timeline, consent history, data export and deletion requests, and safe identity merge.
-- **Calendar and scheduling** — day, week and agenda views, appointment detail with source, channel and assignee, working hours, buffers, blackout dates and booking types.
-- **AI front desk builder** — identity, behaviour rules, per-channel settings, a four-level tool-permission model (disabled / suggest / approval / execute), confidence and sentiment thresholds, escalation rules, voice configuration and an interactive test playground.
-- **Knowledge base** — website, sitemap, URL, PDF, document, text, FAQ, Notion, Google Drive and manual sources, with coverage report, conflicting-answer detection, frequently unanswered questions and citations on every AI answer.
-- **Automations** — trigger / condition / AI step / action / delay / branch / approval flows with activity history and enable / disable toggles.
-- **Analytics** — conversation volume, channel mix, first-response time, resolution time, AI-handled rate, revenue influenced, team workload and cost per conversation, with date-range filters and comparison periods.
-- **Team and permissions** — owner, administrator, manager, agent, analyst and read-only roles, with availability, capacity, skills, languages and assignment rules.
-- **Integrations** — Gmail, Outlook, WhatsApp Business, website chat, Twilio, Google Calendar, Microsoft Calendar, Notion, Zoom, Google Meet, Teams, HubSpot, Salesforce, Pipedrive, Webhooks, Zapier, REST API and Google Drive, each with honest status (not connected, connecting, connected, reauthorization required, permission missing, sync delayed, error, disabled).
-- **Security and audit** — two-factor authentication, active sessions, SSO placeholder, role-based permissions, data retention, call-recording retention, PII masking, IP allowlist placeholder, webhook signing, and a full audit log covering both human and AI actions.
-- **Onboarding** — a seven-step guided setup: business, channels, knowledge, AI identity, availability, test and completion, with a readiness checklist that never claims the agent is live if integrations are missing.
+- A shared inbox across phone, email, WhatsApp and website chat
+- An AI receptionist that answers, transcribes, routes and books (simulated)
+- A lightweight CRM built around conversations
+- A call workspace with live transcripts and after-call summaries (simulated telephony)
+- An appointment scheduler that respects working hours and buffers
+- An automation builder with triggers, conditions, AI steps and approvals
+- A customer-intelligence dashboard
 
-## Route map
+The product runs in **demo mode** by default. Every channel and integration status is honestly labelled. Nothing is marked "connected" without credentials and a successful health check.
 
-The prototype runs on a single `/` route (a client-side state machine) so it can be previewed in restricted environments. The full route map, ready to be split into separate Next.js App Router segments, is:
+---
+
+## Architecture
+
+CloudSun is a Next.js 16 App Router application. The previous single-page state machine has been replaced with real routes.
 
 ```
-/                        Marketing homepage
-/onboarding              Onboarding flow (7 steps)
-/app                     Application shell
-/app/inbox               Unified inbox
-/app/calls               Calls list and live workspace
-/app/contacts            Contacts CRM
-/app/calendar            Calendar
-/app/ai-agent            AI front desk builder
-/app/knowledge           Knowledge base
-/app/automations         Automation builder
-/app/analytics           Analytics
-/app/team                Team management
-/app/integrations        Integrations
-/app/settings            Settings (general, channels, notifications, security)
-/app/billing             Billing
-/app/audit-log           Audit log
+src/app/
+  (marketing)/          Marketing website (route group, URL: /)
+    page.tsx             Homepage
+  (auth)/                Authentication screens (route group)
+    login/page.tsx       /login
+    signup/page.tsx      /signup
+    forgot-password/     /forgot-password
+  onboarding/            7-step guided setup
+    page.tsx             /onboarding
+    business/            /onboarding/business
+    channels/            /onboarding/channels
+    knowledge/           /onboarding/knowledge
+    agent/               /onboarding/agent
+    availability/        /onboarding/availability
+    test/                /onboarding/test
+    complete/            /onboarding/complete
+  app/                   Application dashboard
+    layout.tsx           AppShell (sidebar, topbar, mobile nav)
+    page.tsx             /app (Overview)
+    inbox/               /app/inbox and /app/inbox/[conversationId]
+    calls/               /app/calls and /app/calls/[callId]
+    contacts/            /app/contacts and /app/contacts/[contactId]
+    calendar/            /app/calendar
+    ai-agent/            /app/ai-agent
+    knowledge/           /app/knowledge
+    automations/         /app/automations
+    analytics/           /app/analytics
+    team/                /app/team
+    integrations/        /app/integrations
+    settings/            /app/settings
+    billing/             /app/billing
+    audit-log/           /app/audit-log
+    loading.tsx          Route-level loading state
+    error.tsx            Route-level error boundary
+    not-found.tsx        404 for /app/*
 ```
 
-## Technology stack
+### Demo persistence
 
-- **Framework**: Next.js 16 with App Router
-- **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS 4 with shadcn/ui component library
-- **UI components**: Complete shadcn/ui set (New York style) with Lucide icons
-- **Animation**: Framer Motion patterns and custom CSS keyframes
-- **State**: React hooks and Zustand-ready architecture
-- **Server state**: TanStack Query (available)
-- **Tables**: TanStack Table (available)
-- **Forms**: React Hook Form + Zod (available)
-- **Charts**: Custom SVG and CSS-based charts (Recharts available)
-- **Database**: Prisma ORM (SQLite client) — available when needed
-- **Authentication**: NextAuth.js v4 — available when needed
-
-## Architecture overview
+All demo mutations go through a repository layer backed by `localStorage`:
 
 ```
-src/
-  app/                    Next.js App Router entry (layout, page, globals)
-  components/
-    cloudsun/
-      marketing/          Marketing website components
-      app/                Application shell and section screens
-        sections/         One file per dashboard section
-      shared/             Logo, channel helpers, icon resolver, formatters
-    ui/                   shadcn/ui component library
-  config/
-    cloudsun.ts           Central product identity, navigation, channels, pricing
-  data/
-    demo.ts               Realistic demonstration data and seeded records
-  types/
-    domain.ts             Strict TypeScript domain models
-  lib/                    Utilities and database client
-  hooks/                  Custom React hooks
+src/lib/
+  demo-store.ts          localStorage-backed state with subscribe/reset
+  repositories.ts        Repository interfaces + demo implementations
+  demo-ai.ts             Deterministic simulated AI response engine
+src/hooks/
+  use-demo-state.ts      React hook subscribing to demo state
 ```
 
-The UI consumes typed domain models and adapter interfaces rather than depending directly on any vendor, so production integrations can be connected later without rewriting components.
+The following actions survive a page refresh in demo mode:
 
-## Data model overview
+- Sent messages and internal notes
+- Conversation status, priority, assignee, snooze state
+- Read / unread state
+- AI configuration (draft and published)
+- Integration demo connection status
+- Automation enabled state
+- Audit log entries
 
-Strict TypeScript models are defined for: `Workspace`, `User`, `TeamMember`, `Role`, `Integration`, `Channel`, `Contact`, `ContactIdentity`, `Company`, `Conversation`, `Message`, `Attachment`, `Call`, `CallTranscriptSegment`, `Appointment`, `AvailabilityRule`, `KnowledgeSource`, `Automation`, `AutomationRun`, `AIConfiguration`, `AIResponse`, `AIAction`, `Handoff`, `UsageRecord`, `Notification` and `AuditLog`.
+A **Reset demonstration workspace** action is available in the demo store (`resetDemoWorkspace()`).
 
-## Local installation
+### Production adapter
+
+In production, swap the demo repositories for Prisma repositories that implement the same interfaces. The Prisma schema (`prisma/schema.prisma`) targets PostgreSQL and defines the full production data model: Workspace, WorkspaceMembership, User, Team, TeamMember, Contact, ContactIdentity, Company, Conversation, Message, Attachment, Call, CallTranscriptSegment, Appointment, AvailabilityRule, KnowledgeSource, KnowledgeDocument, AIConfiguration, AIVersion, AIAction, Handoff, Automation, AutomationStep, AutomationRun, Integration, UsageRecord, Notification, AuditLog.
+
+The frontend does not require a database to run in demo mode.
+
+---
+
+## Routes
+
+| Route | Purpose |
+|-------|---------|
+| `/` | Marketing homepage |
+| `/login`, `/signup`, `/forgot-password` | Authentication (demo mode) |
+| `/onboarding` → `/onboarding/complete` | 7-step guided setup |
+| `/app` | Dashboard overview |
+| `/app/inbox`, `/app/inbox/[conversationId]` | Unified inbox with shareable conversation URLs |
+| `/app/calls`, `/app/calls/[callId]` | Calls list and detail with shareable URLs |
+| `/app/contacts`, `/app/contacts/[contactId]` | Contacts CRM with shareable profile URLs |
+| `/app/calendar` | Calendar (day, week, agenda) |
+| `/app/ai-agent` | AI front desk builder with test playground |
+| `/app/knowledge` | Knowledge base with test-question feature |
+| `/app/automations` | Automation builder and activity history |
+| `/app/analytics` | Analytics dashboard |
+| `/app/team` | Team management and roles |
+| `/app/integrations` | Integration catalog with status |
+| `/app/settings` | Workspace, channels, notifications, security |
+| `/app/billing` | Plan, usage, invoices (demonstration) |
+| `/app/audit-log` | Audit log (human + AI + system actions) |
+
+Deep links survive refresh. Browser Back and Forward work. Selected conversations, calls and contacts have shareable URLs.
+
+---
+
+## Demo-mode explanation
+
+CloudSun ships in demo mode. This means:
+
+- **Phone calls** use simulated telephony, clearly labelled "Demo telephony".
+- **Email, WhatsApp, calendar** use typed mock adapters — status is "Provider not connected" until credentials exist.
+- **AI responses** are generated by a deterministic simulation engine (`src/lib/demo-ai.ts`) that detects intent (pricing, booking, rescheduling, cancellation, project-status, request-human, angry-customer, unsupported, after-hours, general) and returns a labelled simulated response with citations and confidence.
+- **Website chat** runs as an interactive demo.
+- All conversation, contact, call and appointment data is seeded demonstration data for a fictional business ("Atelier North").
+- **No fake "live" success messages** are displayed. Every simulated response is labelled "Simulated".
+
+The UI is fully interactive. Every adapter has a clean interface ready to swap in a real provider.
+
+---
+
+## Local persistence explanation
+
+Demo state is stored in `localStorage` under the key `cloudsun.demo.v1`. On first load, the seeded state is written. On subsequent loads, the stored state is used. The `useDemoState()` hook subscribes components to state changes via a custom event.
+
+To reset: call `resetDemoWorkspace()` (available via the repository layer) or clear `localStorage` in your browser devtools.
+
+---
+
+## Setup
 
 ### Prerequisites
 
@@ -109,80 +160,115 @@ Strict TypeScript models are defined for: `Workspace`, `User`, `TeamMember`, `Ro
 ### Install and run
 
 ```bash
-# Clone the repository
 git clone https://github.com/hello-aditya-dev/cloudsun.git
 cd cloudsun
-
-# Install dependencies
 bun install
-
-# Copy the environment template
 cp .env.example .env
-
-# Start the development server
 bun run dev
 ```
 
 Open `http://localhost:3000` in your browser.
 
-### Windows PowerShell 5.1 setup
+### Windows PowerShell 5.1
 
 ```powershell
-# Clone the repository
 git clone https://github.com/hello-aditya-dev/cloudsun.git
 cd cloudsun
-
-# Install dependencies
 bun install
-
-# Copy the environment template
 Copy-Item .env.example .env
-
-# Start the development server
 bun run dev
 ```
 
+---
+
 ## Environment variables
 
-See `.env.example` for the full list. The application runs in demo mode without any credentials — mock adapters keep every channel usable. Connect real credentials only when you are ready to go live.
+See `.env.example`. The application runs in demo mode without any credentials. Connect real credentials only when you are ready to go live. Never commit real secrets. Never expose server secrets through `NEXT_PUBLIC_` variables.
 
-## Demo mode explanation
+| Variable | Purpose |
+|----------|---------|
+| `NEXT_PUBLIC_APP_URL` | Public app URL |
+| `AUTH_SECRET` | NextAuth secret |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth (Gmail, Calendar, Meet, Drive) |
+| `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET` | Microsoft OAuth (Outlook, Calendar, Teams) |
+| `WHATSAPP_ACCESS_TOKEN` / `WHATSAPP_PHONE_NUMBER_ID` / `WHATSAPP_VERIFY_TOKEN` | WhatsApp Business API |
+| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_PHONE_NUMBER` | Twilio telephony |
+| `NOTION_CLIENT_ID` / `NOTION_CLIENT_SECRET` | Notion OAuth |
+| `AI_PROVIDER_API_KEY` | AI provider key (for real AI responses) |
+| `STORAGE_ACCESS_KEY` / `STORAGE_SECRET_KEY` | Storage (recordings, attachments) |
+| `SENTRY_DSN` | Error monitoring |
 
-CloudSun ships in demo mode. This means:
+---
 
-- Phone calls use simulated telephony, clearly labelled.
-- Email, WhatsApp and calendar integrations use typed mock adapters.
-- AI responses are simulated in the test playground.
-- All conversation, contact, call and appointment data is seeded demonstration data for a fictional business ("Atelier North").
-- Channel-health indicators show the real status of each integration.
-- No fake "live" success messages are displayed.
+## Scripts
 
-Demo mode is not a limitation — it is honesty. The interface is fully explorable, and every adapter has a clean interface ready to swap in a real provider.
+All scripts are cross-platform (Windows PowerShell 5.1, macOS, Linux, Vercel). No bash-only redirections or `tee`/`cp`/`rm` are used inside package scripts.
 
-## Integration-adapter explanation
+| Script | Command | Purpose |
+|--------|---------|---------|
+| `dev` | `bun run dev` | Start dev server on port 3000 |
+| `build` | `bun run build` | Production build |
+| `start` | `bun run start` | Start production server |
+| `lint` | `bun run lint` | ESLint |
+| `typecheck` | `bun run typecheck` | TypeScript without emitting |
+| `test` | `bun run test` | Vitest unit tests |
+| `test:watch` | `bun run test:watch` | Vitest in watch mode |
+| `test:e2e` | `bun run test:e2e` | Playwright end-to-end tests |
+| `test:a11y` | `bun run test:a11y` | Playwright accessibility tests |
+| `db:push` | `bun run db:push` | Push Prisma schema to database |
+| `db:generate` | `bun run db:generate` | Generate Prisma client |
+| `db:migrate` | `bun run db:migrate` | Create and apply a Prisma migration |
+| `db:reset` | `bun run db:reset` | Reset the database |
 
-Each external provider (email, WhatsApp, voice, calendar, Notion, AI, storage) is accessed through a typed adapter interface. The UI consumes these interfaces rather than calling vendors directly, so connecting a production provider is a matter of implementing the interface — no component rewrites required. Mock adapters are used by default and keep the interface usable without credentials.
-
-## Available scripts
-
-```bash
-bun run dev          # Start the development server on port 3000
-bun run build        # Production build
-bun run start        # Start the production server
-bun run lint         # Run ESLint
-bun run db:push      # Push the Prisma schema to the database
-bun run db:generate  # Generate the Prisma client
-bun run db:migrate   # Create and apply a Prisma migration
-bun run db:reset     # Reset the database
-```
+---
 
 ## Testing
 
-- **Lint**: `bun run lint` — passes clean with zero errors.
-- **Type checking**: TypeScript strict mode, no errors.
-- **Production build**: `bun run build` — compiles successfully.
-- **Browser verification**: every route renders, every navigation item works, the inbox three-panel layout is interactive, the AI test playground responds to messages, and the knowledge base returns answers with citations.
-- **Responsive**: tested at 1440px, 1280px, 1024px, 768px, 430px, 390px and 360px.
+### Commands
+
+```bash
+bun run lint         # ESLint — passes clean
+bun run typecheck    # TypeScript strict — passes clean
+bun run test         # Vitest unit tests — 22 tests, all pass
+bun run test:e2e     # Playwright e2e tests — 5 tests, all pass
+bun run build        # Production build — passes, 30 routes
+```
+
+### Test coverage
+
+**Unit tests** (`tests/unit/`):
+- `demo-ai.test.ts` — intent detection (9 intents), AI response generation, text transforms (rewrite, shorten, friendlier, formal). 17 tests.
+- `demo-store.test.ts` — demo state seeding, persistence, reset, AI config defaults, audit log growth. 5 tests.
+
+**End-to-end tests** (`tests/e2e/flows.spec.ts`):
+- Marketing → signup → onboarding → dashboard navigation flow
+- Inbox: open and select a conversation
+- Deep link to a conversation survives refresh
+- Browser Back and Forward navigation
+- Every sidebar item navigates to a real route (13 routes checked)
+
+### Exact commands executed during development
+
+```bash
+bun install
+bun run lint
+bun run typecheck
+bun run test
+bun run test:e2e
+bun run build
+npx playwright install chromium
+```
+
+### Test results
+
+- **Lint:** 0 errors, 0 warnings
+- **Typecheck:** 0 errors (strict mode, `ignoreBuildErrors` removed)
+- **Unit tests:** 22 passed, 0 failed
+- **E2e tests:** 5 passed, 0 failed
+- **Production build:** Compiled successfully, 30 routes generated
+
+---
 
 ## Deployment
 
@@ -193,23 +279,54 @@ bun run build
 bun run start
 ```
 
-## Security considerations
+On Vercel, the build works out of the box — no special configuration needed.
 
-- Never commit real secrets. The `.gitignore` excludes `.env*` files.
-- Never expose server secrets through client environment variables.
-- Secret tokens are never displayed after they have been saved in the integrations UI.
-- Two-factor authentication is available for every team member.
-- Role-based access controls cover conversations, call recordings, contact exports, AI settings, knowledge, integrations, billing and audit logs.
-- PII masking and recording retention windows are configurable.
-- The audit log retains every human and AI action.
+---
+
+## Security
+
+### Production headers
+
+The following security headers are set in `next.config.ts`:
+
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: SAMEORIGIN`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()`
+- `Content-Security-Policy` (scoped to self, inline scripts/styles for Next.js, Google Fonts)
+- `Frame-ancestors: 'self'`
+
+### Honest security labels
+
+The Settings → Security tab does not display switches as active production controls unless they are implemented:
+
+- Two-factor authentication → "Requires authentication integration"
+- Single sign-on (SSO) → "Requires Organization plan"
+- IP allowlist → "Placeholder"
+- PII masking → "Demonstration setting"
+- Webhook signing → "Demonstration setting"
+
+### Other
+
+- `reactStrictMode` is enabled.
+- `typescript.ignoreBuildErrors` is removed — the build fails on type errors.
+- All forms are validated with Zod (available; demo forms use native validation).
+- No unsafe HTML rendering (`dangerouslySetInnerHTML` removed from product copy).
+- Confirmation dialogs are used for destructive actions (reset demo workspace, disconnect integration).
+- Secrets are never committed. `.gitignore` excludes `.env*` (except `.env.example`).
+
+---
 
 ## Current limitations
 
-- Telephony, email, WhatsApp and calendar integrations run in demo mode. Production credentials are required for live channels.
-- The AI agent uses simulated responses. A production AI provider key is required for live AI behaviour.
-- Authentication screens exist in the prototype flow but are not wired to a real identity provider.
-- The website chat widget is a demonstration view, not an embeddable production snippet.
-- Database persistence is not enabled; all data is seeded in memory.
+- **Telephony, email, WhatsApp, calendar** run in demo mode. Production credentials are required for live channels.
+- **AI responses** are simulated by a deterministic engine. A production AI provider key is required for real AI behaviour.
+- **Authentication** screens exist but are not wired to a real identity provider. "Sign in" enters the demo workspace without verifying credentials.
+- **Website chat widget** is a demonstration view, not an embeddable production snippet.
+- **Database persistence** is not enabled; all data is seeded in memory and persisted to `localStorage` in demo mode.
+- **Payment processing** does not exist. The "Manage plan" button is disabled. Invoices are labelled "demonstration".
+
+---
 
 ## Production roadmap
 
@@ -218,12 +335,14 @@ bun run start
 3. Connect a production AI provider for live agent behaviour.
 4. Enable Prisma persistence for conversations, contacts, calls, appointments and audit logs.
 5. Build the embeddable website-chat widget as a standalone bundle.
-6. Add automated unit, integration and accessibility tests.
+6. Add automated unit, integration and accessibility test coverage for every component.
 7. Deploy to production with monitoring and error reporting.
+
+---
 
 ## Contribution and ownership
 
-CloudSun is owned and maintained by its repository owner. Contributions are welcome via pull request. Please do not attribute commits to bots, assistants or generated authors.
+CloudSun is owned and maintained by [hello-aditya-dev](https://github.com/hello-aditya-dev). Contributions are welcome via pull request. Please do not attribute commits to bots, assistants or generated authors.
 
 ## Demo data notice
 

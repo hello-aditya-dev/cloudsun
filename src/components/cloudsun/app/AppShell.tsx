@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { m, AnimatePresence, useReducedMotion } from "motion/react";
 import { appNav, product } from "@/config/cloudsun";
 import { workspace as demoWorkspace, team } from "@/data/demo";
 import { Icon } from "../shared/Icon";
@@ -10,31 +13,43 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   ChevronsLeft, Search, Bell, HelpCircle, PanelLeftClose, PanelLeft,
-  Plus, Command, Sparkles, Menu, X, ArrowLeft,
+  Plus, Command, Menu, X, ArrowLeft,
 } from "lucide-react";
 
-export type AppSection = string;
+const sectionToPath: Record<string, string> = {
+  overview: "/app",
+  inbox: "/app/inbox",
+  calls: "/app/calls",
+  contacts: "/app/contacts",
+  calendar: "/app/calendar",
+  "ai-agent": "/app/ai-agent",
+  knowledge: "/app/knowledge",
+  automations: "/app/automations",
+  analytics: "/app/analytics",
+  team: "/app/team",
+  integrations: "/app/integrations",
+  settings: "/app/settings",
+  billing: "/app/billing",
+  "audit-log": "/app/audit-log",
+};
 
-export function AppShell({
-  section,
-  onSection,
-  onExit,
-  children,
-  title,
-}: {
-  section: AppSection;
-  onSection: (s: string) => void;
-  onExit: () => void;
-  children: React.ReactNode;
-  title: string;
-}) {
+const titleMap: Record<string, string> = Object.fromEntries(appNav.map((n) => [n.id, n.label]));
+
+export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const pathname = usePathname();
   const me = team[0];
+
+  // Determine current section from pathname
+  const currentSection = Object.entries(sectionToPath)
+    .sort((a, b) => b[1].length - a[1].length)
+    .find(([, path]) => pathname === path || pathname.startsWith(path + "/"))?.[0] ?? "overview";
+
+  const title = titleMap[currentSection] ?? "Overview";
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      {/* Top bar */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card/60 px-4 backdrop-blur">
         <div className="flex items-center gap-3">
           <button
@@ -70,11 +85,8 @@ export function AppShell({
           </button>
 
           <div className="flex items-center gap-1.5 rounded-full border border-border bg-background px-2.5 py-1 text-[11px]">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[oklch(0.45_0.08_155)] opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[oklch(0.45_0.08_155)]" />
-            </span>
-            <span className="hidden sm:inline">AI online</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.70_0.12_75)]" />
+            <span className="hidden sm:inline">Interactive demo</span>
           </div>
 
           <button className="relative flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted" aria-label="Notifications">
@@ -100,62 +112,38 @@ export function AppShell({
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Desktop sidebar */}
-        <aside
-          className={`hidden shrink-0 flex-col border-r border-border bg-sidebar transition-all duration-300 lg:flex ${
-            collapsed ? "w-16" : "w-60"
-          }`}
-        >
-          <SidebarContent
-            section={section}
-            onSection={onSection}
-            collapsed={collapsed}
-            onExit={onExit}
-          />
+        <aside className={`hidden shrink-0 flex-col border-r border-border bg-sidebar transition-all duration-300 lg:flex ${collapsed ? "w-16" : "w-60"}`}>
+          <SidebarContent currentSection={currentSection} collapsed={collapsed} />
         </aside>
 
-        {/* Main */}
-        <main className="flex-1 overflow-hidden">{children}</main>
+        <main className="flex-1 overflow-hidden">
+          <AnimatedContent>{children}</AnimatedContent>
+        </main>
       </div>
 
-      {/* Mobile bottom nav */}
-      <MobileBottomNav section={section} onSection={onSection} />
+      <MobileBottomNav currentSection={currentSection} />
 
-      {/* Mobile slide-over */}
+      <AnimatePresence>
       {mobileNavOpen && (
         <MobileSlideOver
-          section={section}
-          onSection={(s) => {
-            onSection(s);
-            setMobileNavOpen(false);
-          }}
+          currentSection={currentSection}
+          onSection={() => setMobileNavOpen(false)}
           onClose={() => setMobileNavOpen(false)}
-          onExit={onExit}
         />
       )}
+      </AnimatePresence>
     </div>
   );
 }
 
-function SidebarContent({
-  section,
-  onSection,
-  collapsed,
-  onExit,
-}: {
-  section: string;
-  onSection: (s: string) => void;
-  collapsed: boolean;
-  onExit: () => void;
-}) {
+function SidebarContent({ currentSection, collapsed }: { currentSection: string; collapsed: boolean }) {
   const primary = appNav.filter((n) => n.group === "primary");
   const secondary = appNav.filter((n) => n.group === "secondary");
 
   return (
     <div className="flex h-full flex-col">
-      {/* Workspace switcher */}
       <div className={`border-b border-sidebar-border p-3 ${collapsed ? "px-2" : ""}`}>
-        <button className={`flex w-full items-center gap-2 rounded-lg border border-sidebar-border bg-card p-2 text-left hover:bg-muted ${collapsed ? "justify-center" : ""}`}>
+        <Link href="/app" className={`flex w-full items-center gap-2 rounded-lg border border-sidebar-border bg-card p-2 text-left hover:bg-muted ${collapsed ? "justify-center" : ""}`}>
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[oklch(0.24_0.012_50)] text-white">
             <Logo size={16} />
           </div>
@@ -166,82 +154,69 @@ function SidebarContent({
             </div>
           )}
           {!collapsed && <ChevronsLeft className="h-3.5 w-3.5 rotate-90 text-muted-foreground" />}
-        </button>
+        </Link>
       </div>
 
-      {/* New conversation */}
       <div className={`p-3 ${collapsed ? "px-2" : ""}`}>
-        <button className={`flex w-full items-center gap-2 rounded-lg bg-[oklch(0.62_0.16_42)] px-3 py-2 text-xs font-medium text-white hover:bg-[oklch(0.62_0.16_42)]/90 ${collapsed ? "justify-center" : ""}`}>
+        <Link href="/app/inbox" className={`flex w-full items-center gap-2 rounded-lg bg-[oklch(0.62_0.16_42)] px-3 py-2 text-xs font-medium text-white hover:bg-[oklch(0.62_0.16_42)]/90 ${collapsed ? "justify-center" : ""}`}>
           <Plus className="h-3.5 w-3.5" />
           {!collapsed && "New conversation"}
-        </button>
+        </Link>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 scroll-thin">
         {primary.map((item) => (
-          <NavButton key={item.id} item={item} active={section === item.id} collapsed={collapsed} onClick={() => onSection(item.id)} />
+          <NavButton key={item.id} item={item} active={currentSection === item.id} collapsed={collapsed} />
         ))}
         <div className="my-3 border-t border-sidebar-border" />
         <div className={`px-2 pb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground ${collapsed ? "hidden" : ""}`}>
           Manage
         </div>
         {secondary.map((item) => (
-          <NavButton key={item.id} item={item} active={section === item.id} collapsed={collapsed} onClick={() => onSection(item.id)} />
+          <NavButton key={item.id} item={item} active={currentSection === item.id} collapsed={collapsed} />
         ))}
       </nav>
 
-      {/* Channel health */}
       {!collapsed && (
         <div className="border-t border-sidebar-border p-3">
-          <div className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Channel health</div>
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Channel status</div>
           <div className="space-y-1.5">
             {[
-              { label: "Phone", status: "demo", color: "oklch(0.70 0.12 75)" },
-              { label: "WhatsApp", status: "delayed", color: "oklch(0.70 0.12 75)" },
-              { label: "Email", status: "reauth", color: "oklch(0.62 0.16 42)" },
-              { label: "Website chat", status: "live", color: "oklch(0.45 0.08 155)" },
+              { label: "Phone", status: "Demo telephony" },
+              { label: "WhatsApp", status: "Not connected" },
+              { label: "Email", status: "Not connected" },
+              { label: "Website chat", status: "Interactive demo" },
             ].map((c) => (
               <div key={c.label} className="flex items-center justify-between text-[11px]">
                 <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: c.color }} />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.70_0.12_75)]" />
                   {c.label}
                 </div>
-                <span className="capitalize text-muted-foreground">{c.status}</span>
+                <span className="text-muted-foreground">{c.status}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Exit */}
       <div className={`border-t border-sidebar-border p-3 ${collapsed ? "px-2" : ""}`}>
-        <button
-          onClick={onExit}
+        <Link
+          href="/"
           className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-muted-foreground hover:bg-muted ${collapsed ? "justify-center" : ""}`}
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           {!collapsed && "Back to site"}
-        </button>
+        </Link>
       </div>
     </div>
   );
 }
 
-function NavButton({
-  item,
-  active,
-  collapsed,
-  onClick,
-}: {
-  item: { id: string; label: string; icon: string; badge?: string };
-  active: boolean;
-  collapsed: boolean;
-  onClick: () => void;
-}) {
+function NavButton({ item, active, collapsed }: { item: { id: string; label: string; icon: string; badge?: string }; active: boolean; collapsed: boolean }) {
+  const href = item.id === "overview" ? "/app" : `/app/${item.id}`;
   return (
-    <button
-      onClick={onClick}
+    <Link
+      href={href}
       title={collapsed ? item.label : undefined}
       className={`group relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors ${
         active
@@ -249,7 +224,13 @@ function NavButton({
           : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
       } ${collapsed ? "justify-center" : ""}`}
     >
-      {active && <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r bg-[oklch(0.62_0.16_42)]" />}
+      {active && (
+        <m.span
+          layoutId="sidebar-active"
+          className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r bg-[oklch(0.62_0.16_42)]"
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+        />
+      )}
       <Icon name={item.icon} className="h-4 w-4 shrink-0" />
       {!collapsed && <span className="flex-1 truncate text-left">{item.label}</span>}
       {!collapsed && item.badge && (
@@ -257,66 +238,108 @@ function NavButton({
           {item.badge}
         </span>
       )}
-    </button>
+    </Link>
   );
 }
 
-function MobileBottomNav({ section, onSection }: { section: string; onSection: (s: string) => void }) {
-  const items = appNav.filter((n) =>
-    ["overview", "inbox", "calls", "contacts", "calendar"].includes(n.id)
-  );
+function MobileBottomNav({ currentSection }: { currentSection: string }) {
+  const items = appNav.filter((n) => ["overview", "inbox", "calls", "contacts", "calendar"].includes(n.id));
   return (
     <nav className="flex shrink-0 items-center justify-around border-t border-border bg-card px-2 py-1.5 lg:hidden">
       {items.map((item) => {
-        const active = section === item.id;
+        const href = item.id === "overview" ? "/app" : `/app/${item.id}`;
+        const active = currentSection === item.id;
         return (
-          <button
+          <Link
             key={item.id}
-            onClick={() => onSection(item.id)}
-            className={`flex flex-1 flex-col items-center gap-0.5 rounded-md py-1.5 text-[10px] ${active ? "text-[oklch(0.62_0.16_42)]" : "text-muted-foreground"}`}
+            href={href}
+            className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-md py-1.5 text-[10px] ${active ? "text-[oklch(0.62_0.16_42)]" : "text-muted-foreground"}`}
           >
+            {active && (
+              <m.span
+                layoutId="mobile-nav-active"
+                className="absolute -top-1.5 h-0.5 w-8 rounded-full bg-[oklch(0.62_0.16_42)]"
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] as const }}
+              />
+            )}
             <Icon name={item.icon} className="h-4 w-4" />
             {item.label}
-          </button>
+          </Link>
         );
       })}
     </nav>
   );
 }
 
-function MobileSlideOver({
-  section,
-  onSection,
-  onClose,
-  onExit,
-}: {
-  section: string;
-  onSection: (s: string) => void;
-  onClose: () => void;
-  onExit: () => void;
-}) {
+function MobileSlideOver({ currentSection, onSection, onClose }: { currentSection: string; onSection: () => void; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 lg:hidden">
-      <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute left-0 top-0 h-full w-72 max-w-[85%] animate-fade-up border-r border-border bg-sidebar shadow-lift">
+      <m.div
+        className="absolute inset-0 bg-foreground/30 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.16 }}
+        onClick={onClose}
+      />
+      <m.div
+        className="absolute left-0 top-0 h-full w-72 max-w-[85%] border-r border-border bg-sidebar shadow-lift"
+        initial={{ x: "-100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "-100%" }}
+        transition={{ type: "spring", stiffness: 300, damping: 34, mass: 0.9 }}
+      >
         <div className="flex items-center justify-between border-b border-sidebar-border p-3">
           <Wordmark className="!text-base" />
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted">
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="p-2">
+        <div className="p-2" onClick={onSection}>
           {appNav.map((item) => (
-            <NavButton key={item.id} item={item} active={section === item.id} collapsed={false} onClick={() => onSection(item.id)} />
+            <NavButton key={item.id} item={item} active={currentSection === item.id} collapsed={false} />
           ))}
         </div>
         <div className="border-t border-sidebar-border p-3">
-          <button onClick={onExit} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-muted-foreground hover:bg-muted">
+          <Link href="/" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-muted-foreground hover:bg-muted">
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to site
-          </button>
+          </Link>
         </div>
-      </div>
+      </m.div>
     </div>
+  );
+}
+
+/**
+ * AnimatedContent — wraps dashboard page content with a crossfade + slight
+ * directional movement on route change. Only animates the main content region;
+ * the shell (topbar, sidebar, mobile nav) stays stable.
+ */
+function AnimatedContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const reduced = useReducedMotion();
+
+  if (reduced) {
+    return (
+      <div key={pathname} className="h-full">
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <AnimatePresence mode="wait">
+      <m.div
+        key={pathname}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -6 }}
+        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+        className="h-full"
+      >
+        {children}
+      </m.div>
+    </AnimatePresence>
   );
 }

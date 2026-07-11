@@ -1,16 +1,20 @@
 "use client";
 
-import { channelList, product, pricingTiers } from "@/config/cloudsun";
+import Link from "next/link";
+import { m } from "motion/react";
+import { channelList, product, pricingTiers, formatPrice } from "@/config/cloudsun";
 import { ChannelIcon } from "../shared/Channel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Reveal, RevealGroup, RevealItem } from "../motion/Reveal";
 import {
   Phone, Mail, MessageCircle, MessageSquare, CalendarCheck, ShieldCheck,
   Sparkles, Workflow, BarChart3, BookOpen, Users, Check, ArrowRight,
   PhoneIncoming, PhoneOutgoing, Bot, UserCheck, Clock, AlertTriangle,
   Lock, FileCheck, KeyRound, ScrollText, CheckCircle2, Zap,
 } from "lucide-react";
+import { motionDuration, motionEase } from "@/lib/motion/tokens";
 
 const sectionLabel = "text-[11px] font-semibold uppercase tracking-[0.18em] text-[oklch(0.62_0.16_42)]";
 
@@ -31,7 +35,7 @@ export function ChannelOverview() {
   return (
     <section id="channels" className="border-t border-border/60 bg-background py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="max-w-3xl">
+        <Reveal className="max-w-3xl">
           <SectionLabel>Channels</SectionLabel>
           <SectionHeading>
             One front desk for every channel your clients already use.
@@ -41,24 +45,28 @@ export function ChannelOverview() {
             every interaction as part of the same customer relationship — so a call on Monday and an
             email on Friday show up in one continuous thread.
           </p>
-        </div>
+        </Reveal>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <RevealGroup className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" stagger={0.08}>
           {channelList.map((c) => (
-            <Card key={c.id} className="group overflow-hidden border-border bg-card transition-all hover:shadow-lift">
-              <CardContent className="p-6">
-                <div
-                  className="flex h-11 w-11 items-center justify-center rounded-xl"
-                  style={{ backgroundColor: `${c.color}14`, color: c.color }}
-                >
-                  <ChannelIcon id={c.id} className="h-5 w-5" />
-                </div>
-                <div className="mt-5 font-serif text-xl">{c.label}</div>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.description}</p>
-              </CardContent>
-            </Card>
+            <RevealItem key={c.id}>
+              <m.div whileHover={{ y: -4 }} transition={{ duration: motionDuration.fast, ease: motionEase.out }}>
+                <Card className="group overflow-hidden border-border bg-card transition-shadow hover:shadow-lift">
+                  <CardContent className="p-6">
+                    <div
+                      className="flex h-11 w-11 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: `${c.color}14`, color: c.color }}
+                    >
+                      <ChannelIcon id={c.id} className="h-5 w-5" />
+                    </div>
+                    <div className="mt-5 font-serif text-xl">{c.label}</div>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.description}</p>
+                  </CardContent>
+                </Card>
+              </m.div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </div>
     </section>
   );
@@ -151,7 +159,7 @@ export function AICapabilities() {
   return (
     <section id="ai" className="border-t border-border/60 bg-background py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="max-w-3xl">
+        <Reveal className="max-w-3xl">
           <SectionLabel>AI front desk</SectionLabel>
           <SectionHeading>
             A receptionist that never tires, never misses a lead, and always asks before promising.
@@ -161,24 +169,28 @@ export function AICapabilities() {
             asks one question at a time, and discloses that it&apos;s an AI. The things that need a
             human still go to a human.
           </p>
-        </div>
+        </Reveal>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <RevealGroup className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3" stagger={0.06}>
           {caps.map((c) => {
             const Icon = c.icon;
             return (
-              <Card key={c.title} className="border-border bg-card transition-all hover:shadow-lift">
-                <CardContent className="p-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[oklch(0.62_0.16_42)]/10 text-[oklch(0.62_0.16_42)]">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="mt-5 font-serif text-lg">{c.title}</div>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.body}</p>
-                </CardContent>
-              </Card>
+              <RevealItem key={c.title}>
+                <m.div whileHover={{ y: -3 }} transition={{ duration: motionDuration.fast, ease: motionEase.out }}>
+                  <Card className="border-border bg-card transition-shadow hover:shadow-lift">
+                    <CardContent className="p-6">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[oklch(0.62_0.16_42)]/10 text-[oklch(0.62_0.16_42)]">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div className="mt-5 font-serif text-lg">{c.title}</div>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.body}</p>
+                    </CardContent>
+                  </Card>
+                </m.div>
+              </RevealItem>
             );
           })}
-        </div>
+        </RevealGroup>
       </div>
     </section>
   );
@@ -335,7 +347,7 @@ export function Handoff() {
   return (
     <section className="border-t border-border/60 bg-muted/30 py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="max-w-3xl">
+        <Reveal className="max-w-3xl">
           <SectionLabel>AI and human handoff</SectionLabel>
           <SectionHeading>
             The AI does the repetitive work. A human steps in exactly when it counts.
@@ -345,7 +357,7 @@ export function Handoff() {
             doesn&apos;t guess — it pauses, surfaces the context, and hands off to the right person
             with a clean summary.
           </p>
-        </div>
+        </Reveal>
 
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {[
@@ -433,7 +445,7 @@ export function AutomationSection() {
   return (
     <section className="border-t border-border/60 bg-muted/30 py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="max-w-3xl">
+        <Reveal className="max-w-3xl">
           <SectionLabel>Automations</SectionLabel>
           <SectionHeading>
             Rules that turn “someone should…” into “it&apos;s already done.”
@@ -442,7 +454,7 @@ export function AutomationSection() {
             Build triggers, conditions, AI steps, actions, delays and approvals. No decorative node
             canvas — just a clear, editable flow that actually runs.
           </p>
-        </div>
+        </Reveal>
 
         <div className="mt-12 grid gap-5 md:grid-cols-2">
           {[
@@ -533,7 +545,7 @@ export function SecuritySection() {
   return (
     <section id="security" className="border-t border-border/60 bg-muted/30 py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="max-w-3xl">
+        <Reveal className="max-w-3xl">
           <SectionLabel>Security and control</SectionLabel>
           <SectionHeading>
             You stay in control. The AI works inside the lines you draw.
@@ -543,7 +555,7 @@ export function SecuritySection() {
             retention controls, and honest status on every integration. Nothing pretends to be live
             when it isn&apos;t.
           </p>
-        </div>
+        </Reveal>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
@@ -597,7 +609,7 @@ export function IntegrationsSection() {
   return (
     <section id="integrations" className="border-t border-border/60 bg-background py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="max-w-3xl">
+        <Reveal className="max-w-3xl">
           <SectionLabel>Integrations</SectionLabel>
           <SectionHeading>
             Connect what you already use. Skip what you don&apos;t.
@@ -606,7 +618,7 @@ export function IntegrationsSection() {
             Every integration shows its real status — connected, reauthorisation required, sync
             delayed, error. CloudSun never fakes a live connection.
           </p>
-        </div>
+        </Reveal>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {cats.map((cat) => (
@@ -635,7 +647,7 @@ export function PricingSection() {
   return (
     <section id="pricing" className="border-t border-border/60 bg-muted/30 py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="max-w-3xl">
+        <Reveal className="max-w-3xl">
           <SectionLabel>Pricing</SectionLabel>
           <SectionHeading>
             Plans that scale with your front desk, not your anxiety.
@@ -644,52 +656,55 @@ export function PricingSection() {
             Demo telephony in every plan. Bring your own numbers when you&apos;re ready. No hidden
             per-message surprises.
           </p>
-        </div>
+        </Reveal>
 
-        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+        <RevealGroup className="mt-12 grid gap-5 lg:grid-cols-3" stagger={0.1}>
           {pricingTiers.map((tier) => (
-            <Card
-              key={tier.name}
-              className={`relative overflow-hidden border bg-card ${
-                tier.highlighted ? "border-[oklch(0.62_0.16_42)] shadow-lift" : "border-border"
-              }`}
-            >
-              {tier.highlighted && (
-                <div className="bg-[oklch(0.62_0.16_42)] px-5 py-2 text-center text-xs font-medium text-white">
-                  Most popular
-                </div>
-              )}
-              <CardContent className="p-6">
-                <div className="font-serif text-xl">{tier.name}</div>
-                <p className="mt-1 text-sm text-muted-foreground">{tier.summary}</p>
-                <div className="mt-5 flex items-baseline gap-1">
-                  <span className="font-serif text-4xl">{tier.price}</span>
-                  <span className="text-sm text-muted-foreground">{tier.cadence}</span>
-                </div>
-                <Button
-                  className={`mt-6 w-full ${tier.highlighted ? "bg-[oklch(0.62_0.16_42)] text-white hover:bg-[oklch(0.62_0.16_42)]/90" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+            <RevealItem key={tier.name}>
+              <m.div whileHover={{ y: -4 }} transition={{ duration: motionDuration.fast, ease: motionEase.out }}>
+                <Card
+                  className={`relative overflow-hidden border bg-card ${
+                    tier.highlighted ? "border-[oklch(0.62_0.16_42)] shadow-lift" : "border-border"
+                  }`}
                 >
-                  {tier.cta}
-                </Button>
-                <ul className="mt-6 space-y-2.5">
-                  {tier.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[oklch(0.45_0.08_155)]" />
-                      <span className="text-foreground/80">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+                  {tier.highlighted && (
+                    <div className="bg-[oklch(0.62_0.16_42)] px-5 py-2 text-center text-xs font-medium text-white">
+                      Most popular
+                    </div>
+                  )}
+                  <CardContent className="p-6">
+                    <div className="font-serif text-xl">{tier.name}</div>
+                    <p className="mt-1 text-sm text-muted-foreground">{tier.summary}</p>
+                    <div className="mt-5 flex items-baseline gap-1">
+                      <span className="font-serif text-4xl">{tier.price}</span>
+                      <span className="text-sm text-muted-foreground">{tier.cadence}</span>
+                    </div>
+                    <Button
+                      className={`mt-6 w-full ${tier.highlighted ? "bg-[oklch(0.62_0.16_42)] text-white hover:bg-[oklch(0.62_0.16_42)]/90" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+                    >
+                      {tier.cta}
+                    </Button>
+                    <ul className="mt-6 space-y-2.5">
+                      {tier.features.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-sm">
+                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-[oklch(0.45_0.08_155)]" />
+                          <span className="text-foreground/80">{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </m.div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </div>
     </section>
   );
 }
 
 /* --------------------------- Final CTA ------------------------------------ */
-export function FinalCTA({ onEnter }: { onEnter: () => void }) {
+export function FinalCTA() {
   return (
     <section className="border-t border-border/60 bg-background py-20 lg:py-28">
       <div className="mx-auto max-w-5xl px-5 lg:px-8">
@@ -706,13 +721,17 @@ export function FinalCTA({ onEnter }: { onEnter: () => void }) {
               telephony and calendar when you&apos;re ready.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Button size="lg" onClick={onEnter} className="bg-[oklch(0.62_0.16_42)] text-white hover:bg-[oklch(0.62_0.16_42)]/90">
-                Explore the dashboard
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button size="lg" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                See how it works
-              </Button>
+              <Link href="/app">
+                <Button size="lg" className="bg-[oklch(0.62_0.16_42)] text-white hover:bg-[oklch(0.62_0.16_42)]/90">
+                  Explore the dashboard
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button size="lg" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
+                  See how it works
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { SectionScroll, PageHeader } from "../SectionScroll";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { analytics, appointments, conversations, team, auditLog } from "@/data/demo";
-import { channelList } from "@/config/cloudsun";
+import { channelList, type ChannelId } from "@/config/cloudsun";
 import { ChannelIcon } from "../../shared/Channel";
 import { timeAgo, formatDay, timeOnly } from "../../shared/format";
 import {
@@ -21,7 +22,7 @@ const kpis = [
   { label: "Missed calls recovered", value: "14", delta: "+5", trend: "up", icon: PhoneCall, sub: "via WhatsApp" },
 ];
 
-export function OverviewSection({ onSection }: { onSection: (s: string) => void }) {
+export function OverviewSection() {
   const urgent = conversations.filter((c) => c.priority === "urgent" || c.slaBreached).slice(0, 4);
   const upcoming = appointments.filter((a) => new Date(a.startAt) >= new Date("2026-07-11T13:30:00+05:30")).slice(0, 4);
   const online = team.filter((t) => t.availability !== "offline");
@@ -34,7 +35,7 @@ export function OverviewSection({ onSection }: { onSection: (s: string) => void 
         action={
           <div className="flex gap-2">
             <Button variant="outline" size="sm">Last 14 days</Button>
-            <Button size="sm" onClick={() => onSection("inbox")}>Open inbox</Button>
+            <Link href="/app/inbox"><Button size="sm">Open inbox</Button></Link>
           </div>
         }
       />
@@ -118,7 +119,7 @@ export function OverviewSection({ onSection }: { onSection: (s: string) => void 
                   <div key={c.channel}>
                     <div className="mb-1 flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
-                        <ChannelIcon id={c.channel} className="h-3.5 w-3.5" style={{ color: ch.color } as React.CSSProperties} />
+                        <ChannelIcon id={c.channel as ChannelId} className="h-3.5 w-3.5" style={{ color: ch.color }} />
                         {c.label}
                       </div>
                       <span className="font-medium">{c.count}</span>
@@ -150,13 +151,13 @@ export function OverviewSection({ onSection }: { onSection: (s: string) => void 
                 <AlertTriangle className="h-4 w-4 text-[oklch(0.62_0.16_42)]" />
                 <span className="text-sm font-medium">Needs attention</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => onSection("inbox")}>View all</Button>
+              <Link href="/app/inbox"><Button variant="ghost" size="sm">View all</Button></Link>
             </div>
             <div className="space-y-2">
               {urgent.map((c) => (
-                <button
+                <Link
                   key={c.id}
-                  onClick={() => onSection("inbox")}
+                  href={`/app/inbox/${c.id}`}
                   className="flex w-full items-center gap-3 rounded-lg border border-border bg-background p-3 text-left hover:bg-muted/50"
                 >
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-medium">
@@ -172,7 +173,7 @@ export function OverviewSection({ onSection }: { onSection: (s: string) => void 
                     <div className="truncate text-xs text-muted-foreground">{c.preview}</div>
                   </div>
                   <div className="text-[10px] text-muted-foreground">{timeAgo(c.lastAt)}</div>
-                </button>
+                </Link>
               ))}
             </div>
           </CardContent>
@@ -186,7 +187,7 @@ export function OverviewSection({ onSection }: { onSection: (s: string) => void 
                 <CalendarCheck className="h-4 w-4 text-[oklch(0.45_0.08_155)]" />
                 <span className="text-sm font-medium">Upcoming</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => onSection("calendar")}>Calendar</Button>
+              <Link href="/app/calendar"><Button variant="ghost" size="sm">Calendar</Button></Link>
             </div>
             <div className="space-y-3">
               {upcoming.map((a) => (
@@ -216,7 +217,7 @@ export function OverviewSection({ onSection }: { onSection: (s: string) => void 
                 <Users className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">Team availability</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => onSection("team")}>Team</Button>
+              <Link href="/app/team"><Button variant="ghost" size="sm">Team</Button></Link>
             </div>
             <div className="space-y-2.5">
               {online.map((m) => (
@@ -245,7 +246,7 @@ export function OverviewSection({ onSection }: { onSection: (s: string) => void 
                 <Activity className="h-4 w-4 text-[oklch(0.62_0.16_42)]" />
                 <span className="text-sm font-medium">Recent AI actions</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => onSection("audit-log")}>Audit log</Button>
+              <Link href="/app/audit-log"><Button variant="ghost" size="sm">Audit log</Button></Link>
             </div>
             <div className="space-y-2">
               {auditLog.filter((a) => a.actorType === "ai").slice(0, 4).map((a) => (

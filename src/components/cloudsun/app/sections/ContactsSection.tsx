@@ -134,7 +134,7 @@ export function ContactsSection() {
                     <div className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Connected identities</div>
                     <div className="space-y-1.5">
                       {selected.identities.map((id) => (
-                        <div key={id.handle} className="flex items-center gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2 text-xs">
+                        <div key={`${id.channel}-${id.handle}`} className="flex items-center gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2 text-xs">
                           <ChannelIcon id={id.channel} className="h-3.5 w-3.5 text-muted-foreground" />
                           <span className="flex-1 truncate">{id.handle}</span>
                           {id.verified && <Badge variant="outline" className="text-[9px] gap-0.5"><ShieldCheck className="h-2.5 w-2.5 text-[oklch(0.45_0.08_155)]" /> verified</Badge>}

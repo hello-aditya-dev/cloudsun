@@ -255,6 +255,14 @@ export function SettingsSection() {
                 </div>
               </div>
               <Button size="sm">Save changes</Button>
+
+              <div className="mt-6 border-t border-border pt-4">
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Demo workspace</div>
+                <p className="mb-3 text-xs text-muted-foreground">
+                  All demo changes (sent messages, notes, assignments, AI configuration) are saved locally in your browser. Resetting restores the original seeded state and deletes your local changes.
+                </p>
+                <ResetDemoButton />
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -263,9 +271,9 @@ export function SettingsSection() {
           <div className="grid gap-3 sm:grid-cols-2">
             {[
               { name: "Phone", status: "demo", note: "Demo telephony active. Bring your own Twilio numbers in production." },
-              { name: "Email (Gmail)", status: "reauth", note: "Token expires in 3 days. Reconnect to avoid interruption." },
-              { name: "WhatsApp Business", status: "delayed", note: "Template approval pending. Standard replies working." },
-              { name: "Website chat", status: "live", note: "Widget live on ateliernorth.example. 64 chats this week." },
+              { name: "Email (Gmail)", status: "not_connected", note: "Provider not connected. Configure in Integrations." },
+              { name: "WhatsApp Business", status: "not_connected", note: "Provider not connected. Configure in Integrations." },
+              { name: "Website chat", status: "demo", note: "Interactive demo. Embeddable widget not deployed." },
             ].map((c) => (
               <Card key={c.name} className="border-border bg-card">
                 <CardContent className="p-5">
@@ -310,17 +318,17 @@ export function SettingsSection() {
             <Card className="border-border bg-card">
               <CardContent className="space-y-3 p-6">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"><Lock className="h-3.5 w-3.5" /> Authentication</div>
-                <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><span>Two-factor authentication</span><Switch defaultChecked /></div>
-                <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><span>Single sign-on (SSO)</span><Badge variant="outline" className="text-[9px]">Org plan</Badge></div>
-                <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><span>IP allowlist</span><Badge variant="outline" className="text-[9px]">Placeholder</Badge></div>
+                <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><div><span>Two-factor authentication</span><div className="text-[10px] text-muted-foreground">Requires authentication integration</div></div><Badge variant="outline" className="text-[9px]">Not configured</Badge></div>
+                <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><div><span>Single sign-on (SSO)</span><div className="text-[10px] text-muted-foreground">Requires Organization plan</div></div><Badge variant="outline" className="text-[9px]">Not configured</Badge></div>
+                <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><div><span>IP allowlist</span><div className="text-[10px] text-muted-foreground">Requires Organization plan</div></div><Badge variant="outline" className="text-[9px]">Placeholder</Badge></div>
               </CardContent>
             </Card>
             <Card className="border-border bg-card">
               <CardContent className="space-y-3 p-6">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"><FileCheck className="h-3.5 w-3.5" /> Data & retention</div>
                 <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><span>Call recording retention</span><Badge variant="outline" className="text-[9px]">90 days</Badge></div>
-                <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><span>PII masking</span><Switch defaultChecked /></div>
-                <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><span>Webhook signing</span><Switch defaultChecked /></div>
+                <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><div><span>PII masking</span><div className="text-[10px] text-muted-foreground">Demonstration setting</div></div><Badge variant="outline" className="text-[9px]">Demo</Badge></div>
+                <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2 text-sm"><div><span>Webhook signing</span><div className="text-[10px] text-muted-foreground">Demonstration setting</div></div><Badge variant="outline" className="text-[9px]">Demo</Badge></div>
               </CardContent>
             </Card>
           </div>
@@ -362,9 +370,9 @@ export function BillingSection() {
               <div>
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">Current plan</div>
                 <div className="mt-1 font-serif text-2xl">{workspace.plan}</div>
-                <div className="text-xs text-muted-foreground">₹149 / month · renews Aug 11, 2026</div>
+                <div className="text-xs text-muted-foreground">$149 / month · renews Aug 11, 2026</div>
               </div>
-              <Button size="sm">Manage plan</Button>
+              <Button size="sm" disabled title="No payment method connected in demo mode">Manage plan</Button>
             </div>
             <div className="mt-6 space-y-3">
               {[
@@ -390,11 +398,11 @@ export function BillingSection() {
         <Card className="border-border bg-card">
           <CardContent className="p-6">
             <div className="text-xs uppercase tracking-wide text-muted-foreground">This month</div>
-            <div className="mt-1 font-serif text-3xl">₹2,650</div>
-            <div className="mt-1 text-xs text-muted-foreground">₹1,490 base + ₹1,160 usage</div>
+            <div className="mt-1 font-serif text-3xl">$2,650</div>
+            <div className="mt-1 text-xs text-muted-foreground">$1,490 base + $1,160 usage</div>
             <div className="mt-4 space-y-1.5 text-xs">
               {analytics.monthlyCost.map((c) => (
-                <div key={c.category} className="flex justify-between"><span className="text-muted-foreground">{c.category}</span><span>₹{c.amount}</span></div>
+                <div key={c.category} className="flex justify-between"><span className="text-muted-foreground">{c.category}</span><span>${c.amount}</span></div>
               ))}
             </div>
             <Button variant="outline" size="sm" className="mt-4 w-full"><Download className="h-3.5 w-3.5" /> Download invoice</Button>
@@ -404,13 +412,13 @@ export function BillingSection() {
 
       <Card className="mt-4 border-border bg-card">
         <CardContent className="p-0">
-          <div className="border-b border-border bg-muted/30 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Recent invoices</div>
+          <div className="border-b border-border bg-muted/30 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Recent invoices <span className="ml-2 font-normal normal-case text-[10px]">(demonstration)</span></div>
           <div className="divide-y divide-border">
             {[
-              { id: "INV-2026-07", date: "Jul 11, 2026", amount: "₹2,650", status: "Due" },
-              { id: "INV-2026-06", date: "Jun 11, 2026", amount: "₹2,210", status: "Paid" },
-              { id: "INV-2026-05", date: "May 11, 2026", amount: "₹1,890", status: "Paid" },
-              { id: "INV-2026-04", date: "Apr 11, 2026", amount: "₹1,490", status: "Paid" },
+              { id: "INV-2026-07", date: "Jul 11, 2026", amount: "$2,650", status: "Due" },
+              { id: "INV-2026-06", date: "Jun 11, 2026", amount: "$2,210", status: "Paid" },
+              { id: "INV-2026-05", date: "May 11, 2026", amount: "$1,890", status: "Paid" },
+              { id: "INV-2026-04", date: "Apr 11, 2026", amount: "$1,490", status: "Paid" },
             ].map((inv) => (
               <div key={inv.id} className="flex items-center justify-between px-5 py-3 text-xs">
                 <div className="flex items-center gap-3">
@@ -483,5 +491,26 @@ export function AuditLogSection() {
         Retention: 90 days on Practice plan. Upgrade to Organization for 1-year retention.
       </p>
     </SectionScroll>
+  );
+}
+
+/* ----------------------- Reset demo workspace ----------------------------- */
+function ResetDemoButton() {
+  const [confirming, setConfirming] = useState(false);
+  function reset() {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("cloudsun.demo.v1");
+      window.location.reload();
+    }
+  }
+  if (!confirming) {
+    return <Button variant="outline" size="sm" onClick={() => setConfirming(true)}>Reset demonstration workspace</Button>;
+  }
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-xs text-[oklch(0.62_0.16_42)]">This deletes all local demo changes. Continue?</span>
+      <Button variant="destructive" size="sm" onClick={reset}>Yes, reset</Button>
+      <Button variant="outline" size="sm" onClick={() => setConfirming(false)}>Cancel</Button>
+    </div>
   );
 }
