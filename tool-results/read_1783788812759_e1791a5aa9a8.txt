@@ -1,0 +1,1871 @@
+     1→Total pages: 34
+     2→---
+     3→=== PAGE 1 ===
+     4→CLOUDSUN — PREMIUM MOTION, ANIMATION
+     5→AND INTERACTION OVERHAUL
+     6→You are working inside the existing CloudSun repository:
+     7→https://github.com/hello-aditya-dev/cloudsun
+     8→Live deployment:
+     9→https://cloudsun-aditya.vercel.app/
+    10→CloudSun is an omnichannel AI front desk and client inbox for phone calls, email, WhatsApp, website
+    11→chat and appointment scheduling.
+    12→The website and dashboard are visually strong, but they currently feel too static.
+    13→Your task is to create a complete, production-quality motion system across the marketing website,
+    14→onboarding experience and application dashboard.
+    15→Do not redesign the website.
+    16→Do not change the brand.
+    17→Do not rewrite the content.
+    18→Do not change the product architecture unless a small structural change is necessary for correct
+    19→animation.
+    20→Do not add random animations to every element.
+    21→The objective is to make CloudSun feel:
+    22→Alive.
+    23→Responsive.
+    24→Premium.
+    25→Intelligent.
+    26→Calm.
+    27→Highly polished.
+    28→Deliberate.
+    29→Comparable to a high-end SaaS product designed by an elite product studio.
+    30→The result must feel more expensive without becoming flashy, distracting or slow.
+    31→• 
+    32→• 
+    33→• 
+    34→• 
+    35→• 
+    36→• 
+    37→• 
+    38→• 
+    39→1
+    40→
+    41→=== PAGE 2 ===
+    42→1. PRIMARY MOTION TECHNOLOGY
+    43→Use the current Motion for React package.
+    44→Install:
+    45→bunaddmotion
+    46→Import from:
+    47→import{
+    48→motion,
+    49→m,
+    50→AnimatePresence,
+    51→LayoutGroup,
+    52→LazyMotion,
+    53→domAnimation,
+    54→MotionConfig,
+    55→useAnimate,
+    56→useInView,
+    57→useMotionValue,
+    58→useMotionTemplate,
+    59→useReducedMotion,
+    60→useScroll,
+    61→useSpring,
+    62→useTransform,
+    63→} from"motion/react";
+    64→Do not maintain both framer-motion and motion unless an existing dependency genuinely
+    65→requires the old package.
+    66→If the project does not use framer-motion directly after migration:
+    67→bunremoveframer-motion
+    68→Do not install multiple animation libraries that perform the same job.
+    69→Use:
+    70→Motion for React for stateful, layout, gesture, presence and scroll animation.
+    71→CSS transitions for simple colour and border changes.
+    72→CSS keyframes only for tiny, self-contained decorative loops.
+    73→The Web Animations API only where Motion is unnecessary.
+    74→Do not add GSAP unless there is a specific animation that Motion cannot implement cleanly.
+    75→• 
+    76→• 
+    77→• 
+    78→• 
+    79→2
+    80→
+    81→=== PAGE 3 ===
+    82→2. FIRST AUDIT THE EXISTING MOTION
+    83→Before editing:
+    84→Inspect the complete repository.
+    85→Find all existing animation code.
+    86→Find:
+    87→CSS keyframes.
+    88→setInterval animation loops.
+    89→setTimeout animation simulations.
+    90→Hover transitions.
+    91→Existing Framer Motion imports.
+    92→Transform-based animation.
+    93→Loading states.
+    94→Animated status indicators.
+    95→Open the local website in a real browser .
+    96→Record the current animation behaviour .
+    97→Capture desktop and mobile screenshots.
+    98→Check the browser console.
+    99→Check for hydration warnings.
+   100→Check for layout shifts.
+   101→Identify animation that should be:
+   102→Retained.
+   103→Improved.
+   104→Replaced.
+   105→Removed.
+   106→Do not blindly layer new motion on top of existing effects.
+   107→Consolidate overlapping animation systems.
+   108→3. CREATE A CENTRAL MOTION SYSTEM
+   109→Create:
+   110→src/lib/motion/
+   111→  tokens.ts
+   112→  variants.ts
+   113→  transitions.ts
+   114→  reduced-motion.ts
+   115→Do not scatter arbitrary durations and easing curves across dozens of files.
+   116→1. 
+   117→2. 
+   118→3. 
+   119→4. 
+   120→5. 
+   121→6. 
+   122→7. 
+   123→8. 
+   124→9. 
+   125→10. 
+   126→11. 
+   127→12. 
+   128→13. 
+   129→14. 
+   130→15. 
+   131→16. 
+   132→17. 
+   133→18. 
+   134→◦ 
+   135→◦ 
+   136→◦ 
+   137→◦ 
+   138→3
+   139→
+   140→=== PAGE 4 ===
+   141→Motion timing tokens
+   142→Use a restrained timing system:
+   143→exportconstmotionDuration= {
+   144→instant: 0.1,
+   145→micro: 0.16,
+   146→fast: 0.22,
+   147→standard: 0.32,
+   148→deliberate: 0.48,
+   149→reveal: 0.65,
+   150→} asconst;
+   151→Easing tokens
+   152→Use a premium ease-out curve for most interface animation:
+   153→exportconstmotionEase= {
+   154→out: [0.16, 1, 0.3, 1],
+   155→inOut: [0.65, 0, 0.35, 1],
+   156→soft: [0.22, 1, 0.36, 1],
+   157→} asconst;
+   158→Spring tokens
+   159→Create reusable springs:
+   160→exportconstmotionSpring= {
+   161→soft: {
+   162→type: "spring",
+   163→stiffness: 260,
+   164→damping: 30,
+   165→mass: 0.8,
+   166→},
+   167→snappy: {
+   168→type: "spring",
+   169→stiffness: 420,
+   170→damping: 32,
+   171→mass: 0.65,
+   172→},
+   173→panel: {
+   174→type: "spring",
+   175→stiffness: 300,
+   176→damping: 34,
+   177→mass: 0.9,
+   178→4
+   179→
+   180→=== PAGE 5 ===
+   181→},
+   182→} asconst;
+   183→Tune these values in the browser .
+   184→Do not use exaggerated elastic bouncing.
+   185→CloudSun is a professional business product, not a gaming interface.
+   186→4. GLOBAL MOTION PROVIDER
+   187→Wrap animated product areas in a shared Motion configuration.
+   188→Use:
+   189→MotionConfig.
+   190→LazyMotion.
+   191→domAnimation.
+   192→reducedMotion="user" where appropriate.
+   193→Prefer the smaller m component inside heavily animated sections when using LazyMotion.
+   194→Do not convert the complete Next.js application into one giant client component.
+   195→Keep client boundaries narrow.
+   196→Only components that require browser animation state should use "use client".
+   197→5. GLOBAL MOTION LANGUAGE
+   198→CloudSun’s motion language should communicate:
+   199→AI processing.
+   200→Messages arriving.
+   201→Information connecting.
+   202→Human handoff.
+   203→Appointments being confirmed.
+   204→Calls moving through stages.
+   205→Panels reorganizing smoothly.
+   206→Data becoming actionable.
+   207→The application must not feel like objects are randomly floating.
+   208→Use four primary motion patterns:
+   209→• 
+   210→• 
+   211→• 
+   212→• 
+   213→• 
+   214→• 
+   215→• 
+   216→• 
+   217→• 
+   218→• 
+   219→• 
+   220→• 
+   221→5
+   222→
+   223→=== PAGE 6 ===
+   224→A. Reveal
+   225→For content entering the viewport:
+   226→Opacity from 0 to 1.
+   227→Vertical offset between 12px and 28px.
+   228→Optional very subtle blur from 4px to 0.
+   229→Duration between 0.45 and 0.65 seconds.
+   230→Stagger between 50ms and 90ms.
+   231→Run once for normal marketing sections.
+   232→Do not make every paragraph independently animate.
+   233→Animate logical content groups.
+   234→B. Reflow
+   235→For filters, tabs, cards, panels and changing data:
+   236→Use layout.
+   237→Use layoutId.
+   238→Use LayoutGroup.
+   239→Preserve spatial continuity.
+   240→Avoid elements suddenly teleporting.
+   241→C. Presence
+   242→For drawers, modals, menus, context panels and conditional content:
+   243→Use AnimatePresence.
+   244→Animate both entrance and exit.
+   245→Keep exit animation short.
+   246→Do not leave invisible elements blocking pointer input.
+   247→D. Feedback
+   248→For hover , tap, selection, success and loading:
+   249→Buttons depress slightly on tap.
+   250→Cards lift subtly on hover .
+   251→Selected navigation indicators glide.
+   252→Success states confirm actions.
+   253→Loading states feel responsive.
+   254→Avoid constant pulsing where no action is occurring.
+   255→6. MARKETING HEADER
+   256→Improve the marketing header .
+   257→• 
+   258→• 
+   259→• 
+   260→• 
+   261→• 
+   262→• 
+   263→• 
+   264→• 
+   265→• 
+   266→• 
+   267→• 
+   268→• 
+   269→• 
+   270→• 
+   271→• 
+   272→• 
+   273→• 
+   274→• 
+   275→• 
+   276→• 
+   277→• 
+   278→6
+   279→
+   280→=== PAGE 7 ===
+   281→Initial state
+   282→At the top of the page:
+   283→Slightly taller .
+   284→Mostly transparent warm background.
+   285→Light border .
+   286→Spacious navigation.
+   287→Scrolled state
+   288→After approximately 20–40px scroll:
+   289→Height becomes slightly more compact.
+   290→Background opacity increases.
+   291→Backdrop blur becomes stronger .
+   292→Bottom border becomes more visible.
+   293→Shadow appears subtly.
+   294→Logo and navigation remain stable.
+   295→Do not cause layout shift.
+   296→Use scroll state rather than a heavy continuous animation.
+   297→Navigation links
+   298→On hover:
+   299→Text colour transitions.
+   300→A small underline or dot enters using layoutId.
+   301→The active or hovered indicator should move smoothly between links.
+   302→Do not make each link jump vertically.
+   303→Mobile menu
+   304→Use AnimatePresence.
+   305→Animation:
+   306→Backdrop fades in.
+   307→Menu panel slides down approximately 12–18px while fading.
+   308→Navigation items enter with a short stagger .
+   309→Menu icon morphs or rotates cleanly between Menu and Close.
+   310→Closing must include an exit animation.
+   311→Lock body scroll while open.
+   312→7. HERO SECTION
+   313→The hero is the most important motion area.
+   314→• 
+   315→• 
+   316→• 
+   317→• 
+   318→• 
+   319→• 
+   320→• 
+   321→• 
+   322→• 
+   323→• 
+   324→• 
+   325→• 
+   326→• 
+   327→• 
+   328→• 
+   329→• 
+   330→• 
+   331→• 
+   332→• 
+   333→• 
+   334→• 
+   335→7
+   336→
+   337→=== PAGE 8 ===
+   338→It must communicate the complete CloudSun workflow without overwhelming the user .
+   339→Hero entrance sequence
+   340→Animate in this order:
+   341→Product badge.
+   342→First headline line.
+   343→Highlighted headline line.
+   344→Supporting paragraph.
+   345→Primary and secondary buttons.
+   346→Channel list.
+   347→Product preview.
+   348→Use a coordinated parent variant with staggered children.
+   349→The hero should appear quickly. Do not make users wait through a cinematic intro.
+   350→Recommended total sequence time:
+   351→Approximately 900–1,200ms.
+   352→Primary CTA should become usable almost immediately.
+   353→Headline reveal
+   354→Use a refined mask or clipping reveal.
+   355→Possible implementation:
+   356→<divclassName="overflow-hidden">
+   357→<motion.span
+   358→initial={{y: "110%"}}
+   359→animate={{y: 0 }}
+   360→>
+   361→Everyclientconversation.
+   362→</motion.span>
+   363→</div>
+   364→Use this only for the primary hero headline.
+   365→Do not apply split-character animation to body copy.
+   366→Do not create an artificial typewriter effect for the main headline.
+   367→Hero product preview
+   368→The animated preview should become the signature motion piece.
+   369→1. 
+   370→2. 
+   371→3. 
+   372→4. 
+   373→5. 
+   374→6. 
+   375→7. 
+   376→• 
+   377→• 
+   378→8
+   379→
+   380→=== PAGE 9 ===
+   381→Replace the rigid step switching with a coordinated Motion sequence.
+   382→Animate the process:
+   383→Incoming call arrives.
+   384→Caller card expands.
+   385→Live transcript appears word group by word group.
+   386→AI status changes from listening to processing.
+   387→Calendar availability panel slides into view.
+   388→Available time is selected.
+   389→Appointment card transforms into confirmed state.
+   390→WhatsApp confirmation enters.
+   391→Unified inbox item appears.
+   392→The complete flow resets gently.
+   393→Use:
+   394→AnimatePresence.
+   395→layout.
+   396→layoutId.
+   397→useAnimate.
+   398→Controlled variants.
+   399→Shared element transitions where useful.
+   400→Do not make cards disappear abruptly.
+   401→Hero preview details
+   402→Animate:
+   403→Incoming call ring.
+   404→Caller avatar glow.
+   405→Live waveform.
+   406→Transcript cursor .
+   407→AI listening and speaking states.
+   408→Tool activity.
+   409→Calendar check.
+   410→Confirmation checkmark.
+   411→Message-delivery ticks.
+   412→Inbox unread indicator .
+   413→Keep the animation readable.
+   414→Each step should remain visible long enough to understand.
+   415→Pause the loop when:
+   416→The section is outside the viewport.
+   417→The browser tab is hidden.
+   418→Reduced motion is enabled.
+   419→1. 
+   420→2. 
+   421→3. 
+   422→4. 
+   423→5. 
+   424→6. 
+   425→7. 
+   426→8. 
+   427→9. 
+   428→10. 
+   429→• 
+   430→• 
+   431→• 
+   432→• 
+   433→• 
+   434→• 
+   435→• 
+   436→• 
+   437→• 
+   438→• 
+   439→• 
+   440→• 
+   441→• 
+   442→• 
+   443→• 
+   444→• 
+   445→• 
+   446→• 
+   447→• 
+   448→9
+   449→
+   450→=== PAGE 10 ===
+   451→Hero CTA buttons
+   452→Primary button:
+   453→Slight elevation on hover .
+   454→Arrow moves 3–4px to the right.
+   455→Tap scale approximately 0.98.
+   456→Focus state remains visible.
+   457→Secondary button:
+   458→Play icon transitions subtly.
+   459→Border and background respond to hover .
+   460→Do not spin the icon continuously.
+   461→8. SECTION REVEALS
+   462→Create reusable components:
+   463→<Reveal/>
+   464→<RevealGroup/>
+   465→<StaggerList/>
+   466→<SectionHeadingReveal/>
+   467→Use these across the marketing site.
+   468→Default section reveal:
+   469→initial: {
+   470→opacity: 0,
+   471→y: 24,
+   472→}
+   473→whileInView: {
+   474→opacity: 1,
+   475→y: 0,
+   476→}
+   477→viewport: {
+   478→once: true,
+   479→amount: 0.2,
+   480→}
+   481→Do not use exactly the same animation for every section.
+   482→• 
+   483→• 
+   484→• 
+   485→• 
+   486→• 
+   487→• 
+   488→• 
+   489→10
+   490→
+   491→=== PAGE 11 ===
+   492→Create controlled variations:
+   493→Text reveals upward.
+   494→Product panels reveal with scale from 0.985 to 1.
+   495→Timeline elements progress horizontally.
+   496→Cards stagger .
+   497→Numerical metrics count upward.
+   498→Keep all variations within the same motion language.
+   499→9. CHANNEL OVERVIEW
+   500→For phone, email, WhatsApp and website-chat cards:
+   501→Stagger cards into view.
+   502→Draw or reveal the channel icon.
+   503→Animate the connection line between cards.
+   504→On hover , lift the selected card by approximately 3–5px.
+   505→Increase border definition.
+   506→Shift icon background subtly.
+   507→Reveal one small secondary detail.
+   508→Do not enlarge cards aggressively.
+   509→On mobile:
+   510→Disable hover-specific transformations.
+   511→Use tap feedback only.
+   512→Ensure cards remain stable while scrolling.
+   513→10. UNIFIED CLIENT TIMELINE
+   514→This section should visually communicate that multiple channels belong to one client.
+   515→Animate:
+   516→Timeline path drawing.
+   517→Phone event entering first.
+   518→WhatsApp continuation joining the timeline.
+   519→Email response joining afterward.
+   520→Contact profile consolidating these identities.
+   521→Final unified customer card becoming the focal point.
+   522→Use SVG path animation or a transform-based progress line.
+   523→Use layoutId for channel events that move into the unified customer record.
+   524→Do not use an excessively complex canvas animation.
+   525→• 
+   526→• 
+   527→• 
+   528→• 
+   529→• 
+   530→• 
+   531→• 
+   532→• 
+   533→• 
+   534→• 
+   535→• 
+   536→• 
+   537→• 
+   538→• 
+   539→• 
+   540→• 
+   541→• 
+   542→• 
+   543→• 
+   544→• 
+   545→• 
+   546→• 
+   547→11
+   548→
+   549→=== PAGE 12 ===
+   550→11. AI CAPABILITIES SECTION
+   551→For the AI capability cards:
+   552→Reveal cards in a stagger .
+   553→Animate status changes, not just card entrances.
+   554→Show a simulated intent being detected.
+   555→Show confidence progressing.
+   556→Show a tool permission being evaluated.
+   557→Show a human-handoff decision.
+   558→Use soft highlight movement across the active row.
+   559→The user should understand that the AI:
+   560→Listens.
+   561→Understands.
+   562→Checks business context.
+   563→Takes controlled action.
+   564→Hands off when required.
+   565→Do not use generic sparkling stars as the only representation of AI.
+   566→12. PHONE EXPERIENCE SECTION
+   567→Create a premium voice interaction demonstration.
+   568→Animate:
+   569→Incoming-call panel.
+   570→Call timer .
+   571→Listening state.
+   572→Waveform.
+   573→Transcript messages.
+   574→Intent chip.
+   575→Sentiment state.
+   576→Tool activity.
+   577→Human takeover .
+   578→Call completion.
+   579→Summary creation.
+   580→Waveform requirements:
+   581→No identical bars moving in perfect synchronization.
+   582→Use varied delays and heights.
+   583→Keep movement calm and believable.
+   584→Pause when the call is not active.
+   585→Pause outside the viewport.
+   586→• 
+   587→• 
+   588→• 
+   589→• 
+   590→• 
+   591→• 
+   592→• 
+   593→• 
+   594→• 
+   595→• 
+   596→• 
+   597→• 
+   598→• 
+   599→• 
+   600→• 
+   601→• 
+   602→• 
+   603→• 
+   604→• 
+   605→• 
+   606→• 
+   607→• 
+   608→• 
+   609→• 
+   610→• 
+   611→• 
+   612→• 
+   613→• 
+   614→12
+   615→
+   616→=== PAGE 13 ===
+   617→Use reduced movement on mobile.
+   618→Animate the call-control buttons:
+   619→Hover or focus state.
+   620→Tap state.
+   621→Mute transition.
+   622→Hold transition.
+   623→Transfer panel.
+   624→End-call confirmation.
+   625→Do not animate the entire interface continuously.
+   626→13. APPOINTMENT SECTION
+   627→Animate calendar interactions:
+   628→Date navigation.
+   629→Time-slot availability.
+   630→Selected slot.
+   631→Conflict state.
+   632→Appointment drawer .
+   633→Appointment confirmation.
+   634→Calendar event insertion.
+   635→Confirmation message.
+   636→Use shared layout animation when a time slot becomes an appointment card.
+   637→Use AnimatePresence for:
+   638→Availability panels.
+   639→Conflict warnings.
+   640→Success messages.
+   641→Reschedule state.
+   642→The booking flow should feel like one continuous interaction rather than disconnected screens.
+   643→14. HUMAN HANDOFF SECTION
+   644→Create a visual transition from AI handling to human handling.
+   645→Animate:
+   646→AI is active.
+   647→Confidence drops or sentiment changes.
+   648→Handoff condition appears.
+   649→Human agent avatar enters.
+   650→• 
+   651→• 
+   652→• 
+   653→• 
+   654→• 
+   655→• 
+   656→• 
+   657→• 
+   658→• 
+   659→• 
+   660→• 
+   661→• 
+   662→• 
+   663→• 
+   664→• 
+   665→• 
+   666→• 
+   667→• 
+   668→• 
+   669→1. 
+   670→2. 
+   671→3. 
+   672→4. 
+   673→13
+   674→
+   675→=== PAGE 14 ===
+   676→Conversation ownership indicator moves from AI to human.
+   677→AI summary is attached.
+   678→Human continues the conversation.
+   679→Use layoutId for the ownership indicator .
+   680→This should communicate trust and control.
+   681→Do not make the handoff appear like a system failure.
+   682→15. KNOWLEDGE SECTION
+   683→Animate knowledge sources as a connected system.
+   684→Possible sequence:
+   685→Website source appears.
+   686→PDF source appears.
+   687→Notion source appears.
+   688→FAQ source appears.
+   689→Indexing progress moves.
+   690→A customer question appears.
+   691→Relevant source is highlighted.
+   692→Answer appears with citation.
+   693→Coverage score updates.
+   694→Use restrained progress animation.
+   695→Do not show fake indefinite indexing.
+   696→The sequence should complete and settle.
+   697→16. AUTOMATION SECTION
+   698→Animate the workflow logically:
+   699→Trigger activates.
+   700→Condition is checked.
+   701→AI step processes.
+   702→Approval step waits.
+   703→Human approves.
+   704→Action completes.
+   705→Activity log records success.
+   706→Animate the connection line between steps.
+   707→Use status colour and icon changes.
+   708→5. 
+   709→6. 
+   710→7. 
+   711→• 
+   712→• 
+   713→• 
+   714→• 
+   715→• 
+   716→• 
+   717→• 
+   718→• 
+   719→• 
+   720→1. 
+   721→2. 
+   722→3. 
+   723→4. 
+   724→5. 
+   725→6. 
+   726→7. 
+   727→14
+   728→
+   729→=== PAGE 15 ===
+   730→Do not make every node bounce.
+   731→The motion should resemble a system executing work.
+   732→17. ANALYTICS SECTION
+   733→Animate analytics when the section enters the viewport.
+   734→Implement:
+   735→Number count-up.
+   736→Line chart drawing.
+   737→Bar chart growth.
+   738→Donut or progress-ring completion.
+   739→Comparison badge entrance.
+   740→Tooltip fade and movement.
+   741→Do not animate from zero every time the user scrolls away and back.
+   742→Marketing analytics should animate once.
+   743→Dashboard analytics may animate when the selected time range changes.
+   744→Use realistic duration:
+   745→Counters: 500–900ms.
+   746→Bars: 400–700ms.
+   747→Chart lines: 700–1,000ms.
+   748→Avoid excessive delays between chart elements.
+   749→18. PRICING SECTION
+   750→Pricing cards should feel interactive without becoming playful.
+   751→On reveal:
+   752→Cards enter with slight stagger .
+   753→Highlighted plan settles last or gains a subtle outline emphasis.
+   754→On hover:
+   755→Border becomes clearer .
+   756→Card rises 3–4px.
+   757→Shadow becomes slightly stronger .
+   758→CTA arrow shifts.
+   759→Feature checkmarks respond subtly.
+   760→• 
+   761→• 
+   762→• 
+   763→• 
+   764→• 
+   765→• 
+   766→• 
+   767→• 
+   768→• 
+   769→• 
+   770→• 
+   771→• 
+   772→• 
+   773→• 
+   774→• 
+   775→• 
+   776→15
+   777→
+   778→=== PAGE 16 ===
+   779→Do not make the featured plan permanently pulse.
+   780→Do not use large 3D tilt.
+   781→19. FINAL CTA
+   782→Create one restrained ambient animation:
+   783→Slow gradient movement.
+   784→Very subtle background glow.
+   785→A few connection lines or signal points.
+   786→CTA button feedback.
+   787→Keep text perfectly readable.
+   788→Disable or greatly simplify ambient movement for reduced-motion users.
+   789→20. DASHBOARD PAGE AND SECTION
+   790→TRANSITIONS
+   791→The dashboard must feel like a real application, not a collection of pages.
+   792→When navigating between dashboard sections:
+   793→Previous content exits with a 6–10px horizontal or vertical offset.
+   794→New content enters from the corresponding direction.
+   795→Opacity transition remains fast.
+   796→Total navigation transition should be approximately 180–280ms.
+   797→Navigation must never feel delayed.
+   798→Do not animate the entire fixed application shell.
+   799→Keep these stable:
+   800→Top bar .
+   801→Sidebar .
+   802→Mobile bottom navigation.
+   803→Animate only the main content region.
+   804→Use AnimatePresence with stable keys.
+   805→• 
+   806→• 
+   807→• 
+   808→• 
+   809→• 
+   810→• 
+   811→• 
+   812→• 
+   813→• 
+   814→• 
+   815→• 
+   816→• 
+   817→16
+   818→
+   819→=== PAGE 17 ===
+   820→21. SIDEBAR
+   821→Improve sidebar motion.
+   822→Collapse and expand
+   823→Use layout animation for:
+   824→Width.
+   825→Logo area.
+   826→Workspace switcher .
+   827→Labels.
+   828→Badges.
+   829→Channel-health area.
+   830→Requirements:
+   831→Icons stay spatially stable.
+   832→Text fades rather than being abruptly removed.
+   833→Tooltip appears for collapsed navigation.
+   834→Main content reflows smoothly.
+   835→No horizontal shaking.
+   836→Active navigation
+   837→Use one layoutId active indicator .
+   838→The active background or left indicator should glide between menu items.
+   839→Do not create separate enter animations for every selected item.
+   840→Notification badges
+   841→When a badge value changes:
+   842→Scale in slightly.
+   843→Crossfade number .
+   844→Avoid continuous pulsing.
+   845→22. TOP BAR
+   846→Animate:
+   847→Search opening into command palette.
+   848→Notification panel.
+   849→Help panel.
+   850→User menu.
+   851→• 
+   852→• 
+   853→• 
+   854→• 
+   855→• 
+   856→• 
+   857→• 
+   858→• 
+   859→• 
+   860→• 
+   861→• 
+   862→• 
+   863→• 
+   864→• 
+   865→• 
+   866→• 
+   867→• 
+   868→• 
+   869→17
+   870→
+   871→=== PAGE 18 ===
+   872→AI status changes.
+   873→Workspace switcher .
+   874→Command palette:
+   875→Backdrop fades.
+   876→Dialog scales from approximately 0.98 to 1.
+   877→Results stagger very slightly.
+   878→Selection highlight uses layout animation.
+   879→Closing includes exit animation.
+   880→Do not animate the search field continuously.
+   881→23. OVERVIEW DASHBOARD
+   882→Add meaningful animation to:
+   883→KPI counters.
+   884→Urgent-conversation cards.
+   885→Channel-health rows.
+   886→Upcoming appointments.
+   887→AI-action feed.
+   888→Charts.
+   889→Status changes.
+   890→Use stagger only for the first page load.
+   891→When filters change:
+   892→Use layout animation.
+   893→Crossfade changing numbers.
+   894→Animate chart changes.
+   895→Do not replay the complete page entrance.
+   896→Create a subtle live activity indicator for genuinely simulated live data.
+   897→Clearly label it as demo activity.
+   898→24. UNIFIED INBOX
+   899→The inbox should receive the most detailed microinteraction work.
+   900→Conversation list
+   901→Animate:
+   902→Selected-row background using layoutId.
+   903→• 
+   904→• 
+   905→• 
+   906→• 
+   907→• 
+   908→• 
+   909→• 
+   910→• 
+   911→• 
+   912→• 
+   913→• 
+   914→• 
+   915→• 
+   916→• 
+   917→• 
+   918→• 
+   919→• 
+   920→• 
+   921→• 
+   922→18
+   923→
+   924→=== PAGE 19 ===
+   925→Unread dot appearing and disappearing.
+   926→Conversation reordering using layout.
+   927→New message preview update.
+   928→Assignment badge change.
+   929→Priority change.
+   930→Filtered rows entering and exiting.
+   931→Empty state transition.
+   932→Do not animate rows from large distances.
+   933→Opening a conversation
+   934→Use:
+   935→Fast crossfade.
+   936→8–12px directional movement.
+   937→Context panel updates.
+   938→Shared contact-avatar transition where appropriate.
+   939→Keep the interface responsive.
+   940→Message thread
+   941→Animate new messages:
+   942→Opacity.
+   943→8–12px vertical entry.
+   944→Slight scale from 0.99.
+   945→Delivery-state transition.
+   946→Animate:
+   947→Customer messages.
+   948→AI messages.
+   949→Human messages.
+   950→Internal notes.
+   951→System events.
+   952→Each message type should have a related but distinct entrance.
+   953→Do not replay entrance animations for the complete existing conversation every time it opens.
+   954→Only animate newly inserted messages strongly.
+   955→AI draft
+   956→When AI draft is selected:
+   957→Button enters processing state.
+   958→Small progress indication appears.
+   959→Composer content appears naturally.
+   960→• 
+   961→• 
+   962→• 
+   963→• 
+   964→• 
+   965→• 
+   966→• 
+   967→• 
+   968→• 
+   969→• 
+   970→• 
+   971→• 
+   972→• 
+   973→• 
+   974→• 
+   975→• 
+   976→• 
+   977→• 
+   978→• 
+   979→• 
+   980→1. 
+   981→2. 
+   982→3. 
+   983→19
+   984→
+   985→=== PAGE 20 ===
+   986→AI attribution appears.
+   987→Rewrite tools become available.
+   988→Do not make text appear instantly after a fixed delay.
+   989→Use a controlled line or paragraph reveal.
+   990→Do not use a slow character-by-character typewriter for full emails.
+   991→Composer
+   992→Animate:
+   993→Reply and internal-note mode.
+   994→Channel switcher .
+   995→Attachment preview.
+   996→Approval state.
+   997→Scheduled-send state.
+   998→Send success.
+   999→Validation errors.
+  1000→Composer expansion.
+  1001→Use layout animation when the composer grows.
+  1002→Tap feedback on Send must remain immediate.
+  1003→Context panel
+  1004→Use AnimatePresence.
+  1005→When opening:
+  1006→Slide 16–24px from the right.
+  1007→Fade simultaneously.
+  1008→Main conversation reflows smoothly.
+  1009→When closing:
+  1010→Shorter exit.
+  1011→No sudden width jump.
+  1012→25. CALLS DASHBOARD
+  1013→Improve:
+  1014→Calls-list filtering.
+  1015→Selected-call transition.
+  1016→Live-call mode.
+  1017→4. 
+  1018→5. 
+  1019→• 
+  1020→• 
+  1021→• 
+  1022→• 
+  1023→• 
+  1024→• 
+  1025→• 
+  1026→• 
+  1027→• 
+  1028→• 
+  1029→• 
+  1030→• 
+  1031→• 
+  1032→• 
+  1033→• 
+  1034→• 
+  1035→20
+  1036→
+  1037→=== PAGE 21 ===
+  1038→Call controls.
+  1039→Transcript updates.
+  1040→Recording playback.
+  1041→Quality flags.
+  1042→Follow-up creation.
+  1043→Live-call mode
+  1044→Animate:
+  1045→Incoming caller panel.
+  1046→Call connection.
+  1047→Call timer .
+  1048→Consent state.
+  1049→Listening and speaking transition.
+  1050→Transcript appearance.
+  1051→Detected intent.
+  1052→Sentiment update.
+  1053→Calendar action.
+  1054→Human takeover .
+  1055→End-call state.
+  1056→Summary generation.
+  1057→Avoid fake random motion.
+  1058→All movement should correspond to a call state.
+  1059→Recording player
+  1060→Implement real visual progress animation for the demonstration player .
+  1061→The progress indicator should move when Play is selected.
+  1062→Pause should stop progress.
+  1063→Restart when reaching the end.
+  1064→Clearly label it as demonstration audio unless a real local audio file is included.
+  1065→26. CONTACTS
+  1066→Animate:
+  1067→List filtering.
+  1068→Search results.
+  1069→Lead-stage changes.
+  1070→Contact selection.
+  1071→Contact drawer or page.
+  1072→• 
+  1073→• 
+  1074→• 
+  1075→• 
+  1076→• 
+  1077→• 
+  1078→• 
+  1079→• 
+  1080→• 
+  1081→• 
+  1082→• 
+  1083→• 
+  1084→• 
+  1085→• 
+  1086→• 
+  1087→• 
+  1088→• 
+  1089→• 
+  1090→• 
+  1091→• 
+  1092→• 
+  1093→• 
+  1094→21
+  1095→
+  1096→=== PAGE 22 ===
+  1097→Timeline entries.
+  1098→Notes saving.
+  1099→Tag additions.
+  1100→Identity merge dialog.
+  1101→Use layout when contacts reorder after status or stage changes.
+  1102→Do not apply hover movement to every table row.
+  1103→Use subtle background and icon feedback instead.
+  1104→27. CALENDAR DASHBOARD
+  1105→Animate:
+  1106→Day, week and agenda view changes.
+  1107→Date navigation.
+  1108→Today selection.
+  1109→Appointment insertion.
+  1110→Appointment drag or reschedule.
+  1111→Conflict warning.
+  1112→Appointment detail drawer .
+  1113→Time-slot hover and selection.
+  1114→Team-filter changes.
+  1115→Use layout animation to move appointment blocks.
+  1116→Use AnimatePresence for drawers and warnings.
+  1117→Do not animate every time-grid line.
+  1118→28. AI FRONT DESK BUILDER
+  1119→Animate:
+  1120→Tab changes.
+  1121→Active-tab indicator .
+  1122→Draft status.
+  1123→Save state.
+  1124→Publish state.
+  1125→Permission-level changes.
+  1126→Confidence sliders.
+  1127→Voice testing.
+  1128→Pronunciation rows.
+  1129→Playground responses.
+  1130→Retrieved knowledge.
+  1131→Tool-call activity.
+  1132→• 
+  1133→• 
+  1134→• 
+  1135→• 
+  1136→• 
+  1137→• 
+  1138→• 
+  1139→• 
+  1140→• 
+  1141→• 
+  1142→• 
+  1143→• 
+  1144→• 
+  1145→• 
+  1146→• 
+  1147→• 
+  1148→• 
+  1149→• 
+  1150→• 
+  1151→• 
+  1152→• 
+  1153→• 
+  1154→• 
+  1155→• 
+  1156→• 
+  1157→22
+  1158→
+  1159→=== PAGE 23 ===
+  1160→Handoff decision.
+  1161→Tabs
+  1162→Use a shared layoutId indicator .
+  1163→Tab content should:
+  1164→Fade.
+  1165→Move approximately 8px.
+  1166→Complete in under 250ms.
+  1167→Do not make users wait between configuration tabs.
+  1168→Permission controls
+  1169→When permission changes:
+  1170→Status colour transitions.
+  1171→Icon transitions.
+  1172→Explanation updates.
+  1173→Approval warning enters when necessary.
+  1174→Publish
+  1175→Create states:
+  1176→Unsaved.
+  1177→Saving.
+  1178→Saved.
+  1179→Publishing.
+  1180→Published.
+  1181→Error .
+  1182→Use clear feedback, not decorative animation.
+  1183→Voice preview
+  1184→When Test voice is selected:
+  1185→Button switches to playing.
+  1186→Waveform animates.
+  1187→Progress appears.
+  1188→Stop control is available.
+  1189→Waveform stops afterward.
+  1190→• 
+  1191→• 
+  1192→• 
+  1193→• 
+  1194→• 
+  1195→• 
+  1196→• 
+  1197→• 
+  1198→1. 
+  1199→2. 
+  1200→3. 
+  1201→4. 
+  1202→5. 
+  1203→6. 
+  1204→• 
+  1205→• 
+  1206→• 
+  1207→• 
+  1208→• 
+  1209→23
+  1210→
+  1211→=== PAGE 24 ===
+  1212→29. KNOWLEDGE DASHBOARD
+  1213→Animate:
+  1214→Source addition.
+  1215→Source removal.
+  1216→Sync state.
+  1217→Indexing progress.
+  1218→Search filtering.
+  1219→Source-status changes.
+  1220→Citation preview.
+  1221→Conflict warnings.
+  1222→Coverage-score updates.
+  1223→New sources should enter with layout animation.
+  1224→Removed sources should exit cleanly.
+  1225→Do not animate indefinite progress loops without a clear state label.
+  1226→30. AUTOMATIONS DASHBOARD
+  1227→Animate:
+  1228→Workflow creation.
+  1229→Step insertion.
+  1230→Step removal.
+  1231→Reordering.
+  1232→Enabling and disabling.
+  1233→Test execution.
+  1234→Approval state.
+  1235→Successful completion.
+  1236→Error state.
+  1237→Activity-log additions.
+  1238→Use Reorder or dnd-kit together with Motion layout animation where appropriate.
+  1239→Drag requirements:
+  1240→Lift selected step.
+  1241→Add shadow.
+  1242→Slight scale increase.
+  1243→Smoothly move surrounding steps.
+  1244→Return cleanly when dropped.
+  1245→Do not use large rotation during drag.
+  1246→• 
+  1247→• 
+  1248→• 
+  1249→• 
+  1250→• 
+  1251→• 
+  1252→• 
+  1253→• 
+  1254→• 
+  1255→• 
+  1256→• 
+  1257→• 
+  1258→• 
+  1259→• 
+  1260→• 
+  1261→• 
+  1262→• 
+  1263→• 
+  1264→• 
+  1265→• 
+  1266→• 
+  1267→• 
+  1268→• 
+  1269→• 
+  1270→24
+  1271→
+  1272→=== PAGE 25 ===
+  1273→31. ANALYTICS DASHBOARD
+  1274→Animate data changes caused by:
+  1275→Date-range changes.
+  1276→Channel filters.
+  1277→Team filters.
+  1278→Comparison-period changes.
+  1279→Use:
+  1280→Number interpolation.
+  1281→Chart morph or crossfade.
+  1282→Bar resizing.
+  1283→Tooltip motion.
+  1284→Loading skeleton transition.
+  1285→Do not remount the complete analytics page for every filter change.
+  1286→32. INTEGRATIONS
+  1287→Animate integration lifecycle states:
+  1288→Not connected.
+  1289→Opening configuration.
+  1290→Connecting.
+  1291→Connected or simulated.
+  1292→Syncing.
+  1293→Error .
+  1294→Reauthorization required.
+  1295→Disconnected.
+  1296→Use:
+  1297→Animated status icon transition.
+  1298→Badge crossfade.
+  1299→Progress indicator .
+  1300→Modal or drawer presence.
+  1301→Success confirmation.
+  1302→Do not display a permanently spinning indicator .
+  1303→• 
+  1304→• 
+  1305→• 
+  1306→• 
+  1307→• 
+  1308→• 
+  1309→• 
+  1310→• 
+  1311→• 
+  1312→1. 
+  1313→2. 
+  1314→3. 
+  1315→4. 
+  1316→5. 
+  1317→6. 
+  1318→7. 
+  1319→8. 
+  1320→• 
+  1321→• 
+  1322→• 
+  1323→• 
+  1324→• 
+  1325→25
+  1326→
+  1327→=== PAGE 26 ===
+  1328→33. SETTINGS, TEAM, BILLING AND AUDIT LOG
+  1329→Settings
+  1330→Animate:
+  1331→Tab indicator .
+  1332→Save confirmation.
+  1333→Toggle changes.
+  1334→Security warnings.
+  1335→Session revocation.
+  1336→Retention-setting changes.
+  1337→Team
+  1338→Animate:
+  1339→Invite modal.
+  1340→New member insertion.
+  1341→Availability change.
+  1342→Capacity bars.
+  1343→Role update.
+  1344→Assignment-rule toggles.
+  1345→Billing
+  1346→Animate:
+  1347→Usage bars.
+  1348→Invoice drawer .
+  1349→Plan comparison modal.
+  1350→Currency and plan transitions.
+  1351→Do not create celebratory confetti for ordinary billing actions.
+  1352→Audit log
+  1353→Animate:
+  1354→New activity entries.
+  1355→Filter changes.
+  1356→Expanded details.
+  1357→Export-state feedback.
+  1358→Keep audit data calm and readable.
+  1359→• 
+  1360→• 
+  1361→• 
+  1362→• 
+  1363→• 
+  1364→• 
+  1365→• 
+  1366→• 
+  1367→• 
+  1368→• 
+  1369→• 
+  1370→• 
+  1371→• 
+  1372→• 
+  1373→• 
+  1374→• 
+  1375→• 
+  1376→• 
+  1377→• 
+  1378→• 
+  1379→26
+  1380→
+  1381→=== PAGE 27 ===
+  1382→34. MODALS, DRAWERS, POPOVERS AND TOASTS
+  1383→Create consistent presence variants.
+  1384→Modal
+  1385→Backdrop opacity: 0 → 1.
+  1386→Dialog opacity: 0 → 1.
+  1387→Dialog scale: 0.98 → 1.
+  1388→Dialog Y: 8px → 0.
+  1389→Use short exit.
+  1390→Drawer
+  1391→Slide from correct edge.
+  1392→Background fades.
+  1393→Use spring transition.
+  1394→Do not overshoot heavily.
+  1395→Dropdown and popover
+  1396→Small opacity transition.
+  1397→Y offset between 4px and 8px.
+  1398→Duration below 180ms.
+  1399→Correct transform origin.
+  1400→Toast
+  1401→Enter from bottom-right on desktop.
+  1402→Enter from bottom-centre on mobile.
+  1403→Swipe dismissal where supported.
+  1404→Animate progress only when the toast is timed.
+  1405→Do not create separate random motion styles for each component.
+  1406→35. BUTTON AND CARD MICROINTERACTIONS
+  1407→Buttons
+  1408→All primary interactive buttons should have:
+  1409→Hover response.
+  1410→Tap response.
+  1411→Focus-visible state.
+  1412→Disabled state.
+  1413→Loading state.
+  1414→Success state where relevant.
+  1415→• 
+  1416→• 
+  1417→• 
+  1418→• 
+  1419→• 
+  1420→• 
+  1421→• 
+  1422→• 
+  1423→• 
+  1424→• 
+  1425→• 
+  1426→• 
+  1427→• 
+  1428→• 
+  1429→• 
+  1430→• 
+  1431→• 
+  1432→• 
+  1433→• 
+  1434→• 
+  1435→• 
+  1436→• 
+  1437→• 
+  1438→27
+  1439→
+  1440→=== PAGE 28 ===
+  1441→Recommended:
+  1442→whileHover={{y: -1 }}
+  1443→whileTap={{scale: 0.98}}
+  1444→Use selectively.
+  1445→Do not add scale animation to tiny icon buttons if it makes them visually unstable.
+  1446→Cards
+  1447→Do not make every card lift.
+  1448→Only interactive cards should respond.
+  1449→Interactive-card hover:
+  1450→Y: -2px to -4px.
+  1451→Border definition increases.
+  1452→Shadow increases subtly.
+  1453→Internal arrow or icon shifts.
+  1454→Non-interactive information cards should remain stable.
+  1455→36. CURSOR-RESPONSIVE EFFECTS
+  1456→Use cursor-following effects very sparingly.
+  1457→Allowed locations:
+  1458→Hero product preview.
+  1459→One or two major marketing feature cards.
+  1460→Possible effect:
+  1461→Very subtle radial highlight following pointer position.
+  1462→Minimal card perspective.
+  1463→Maximum rotation approximately 1–1.5 degrees.
+  1464→Do not add cursor-following effects to:
+  1465→Dashboard tables.
+  1466→Inbox rows.
+  1467→Form controls.
+  1468→Calendar cells.
+  1469→Mobile devices.
+  1470→• 
+  1471→• 
+  1472→• 
+  1473→• 
+  1474→• 
+  1475→• 
+  1476→• 
+  1477→• 
+  1478→• 
+  1479→• 
+  1480→• 
+  1481→• 
+  1482→• 
+  1483→• 
+  1484→28
+  1485→
+  1486→=== PAGE 29 ===
+  1487→Disable tilt for:
+  1488→Reduced-motion users.
+  1489→Touch devices.
+  1490→Low-power contexts where detected.
+  1491→37. SCROLL-LINKED MOTION
+  1492→Use scroll-linked animation only where it adds meaning.
+  1493→Allowed:
+  1494→Thin page-progress indicator .
+  1495→Slight hero-preview parallax.
+  1496→Timeline progression.
+  1497→Section visual progressing as the explanation changes.
+  1498→Not allowed:
+  1499→Scroll-jacking.
+  1500→Forced smooth scrolling.
+  1501→Large text moving at different speeds.
+  1502→Sections pinned for excessive durations.
+  1503→Content becoming unreadable while scrolling.
+  1504→Large continuous blur effects.
+  1505→Use useScroll, useTransform and useSpring.
+  1506→Keep parallax travel below approximately 40px.
+  1507→38. REDUCED MOTION
+  1508→Accessibility is mandatory.
+  1509→Use:
+  1510→useReducedMotion.
+  1511→MotionConfig.
+  1512→prefers-reduced-motion.
+  1513→When reduced motion is enabled:
+  1514→Remove parallax.
+  1515→Remove large translations.
+  1516→Remove continuous decorative loops.
+  1517→Disable cursor tilt.
+  1518→Disable repeated waveform animation unless required to communicate live call state.
+  1519→• 
+  1520→• 
+  1521→• 
+  1522→• 
+  1523→• 
+  1524→• 
+  1525→• 
+  1526→• 
+  1527→• 
+  1528→• 
+  1529→• 
+  1530→• 
+  1531→• 
+  1532→• 
+  1533→• 
+  1534→• 
+  1535→• 
+  1536→• 
+  1537→• 
+  1538→• 
+  1539→• 
+  1540→29
+  1541→
+  1542→=== PAGE 30 ===
+  1543→Replace complex transitions with short opacity changes.
+  1544→Keep all content and actions available.
+  1545→Do not remove essential status feedback.
+  1546→Test the application with reduced motion enabled at operating-system level.
+  1547→39. PERFORMANCE REQUIREMENTS
+  1548→Animation must improve perceived quality without degrading performance.
+  1549→Requirements:
+  1550→Prefer transform and opacity.
+  1551→Avoid frequent layout-triggering property animation.
+  1552→Use Motion layout animation for measured reflow.
+  1553→Avoid animating large blurred layers continuously.
+  1554→Avoid large full-screen filters.
+  1555→Pause offscreen loops.
+  1556→Pause hidden-tab animations.
+  1557→Do not attach one scroll listener per card.
+  1558→Avoid unnecessary React state updates every animation frame.
+  1559→Use Motion values for frame-sensitive animation.
+  1560→Use LazyMotion.
+  1561→Lazy-load heavy demonstration sections.
+  1562→Memoize expensive static visual components only where measurements show benefit.
+  1563→Prevent unnecessary list re-renders in inbox and calls.
+  1564→Avoid introducing hydration errors.
+  1565→Avoid cumulative layout shift.
+  1566→Maintain smooth scrolling.
+  1567→Do not use JavaScript intervals for simple continuous animation when Motion or CSS can handle it.
+  1568→40. MOBILE MOTION
+  1569→Mobile motion must not simply copy desktop motion.
+  1570→Requirements:
+  1571→Shorter durations.
+  1572→Smaller distances.
+  1573→No hover assumptions.
+  1574→No cursor effects.
+  1575→Drawers should feel touch-native.
+  1576→Bottom navigation indicator should glide.
+  1577→Full-screen conversation transitions should reflect forward and backward navigation.
+  1578→Keep keyboard and composer behaviour stable.
+  1579→Do not animate elements beneath the software keyboard.
+  1580→• 
+  1581→• 
+  1582→• 
+  1583→• 
+  1584→• 
+  1585→• 
+  1586→• 
+  1587→• 
+  1588→• 
+  1589→• 
+  1590→• 
+  1591→• 
+  1592→• 
+  1593→• 
+  1594→• 
+  1595→• 
+  1596→• 
+  1597→• 
+  1598→• 
+  1599→• 
+  1600→• 
+  1601→• 
+  1602→• 
+  1603→• 
+  1604→• 
+  1605→• 
+  1606→• 
+  1607→• 
+  1608→• 
+  1609→30
+  1610→
+  1611→=== PAGE 31 ===
+  1612→Avoid large fixed animated backgrounds.
+  1613→Respect low-power devices.
+  1614→Mobile transitions should generally complete within 160–260ms.
+  1615→41. DO NOT DO THESE THINGS
+  1616→Do not:
+  1617→Add animation to every text element.
+  1618→Animate every card on every scroll.
+  1619→Use excessive scale effects.
+  1620→Use exaggerated spring bouncing.
+  1621→Add random floating objects.
+  1622→Add large glowing orbs everywhere.
+  1623→Add a custom cursor to the dashboard.
+  1624→Add scroll-jacking.
+  1625→Add long page transitions.
+  1626→Animate large blur filters continuously.
+  1627→Use typewriter animation for large paragraphs.
+  1628→Make the user wait for animation before interacting.
+  1629→Hide information behind hover-only states.
+  1630→break keyboard navigation.
+  1631→Ignore reduced-motion preferences.
+  1632→install several competing animation packages.
+  1633→change CloudSun’s colour palette.
+  1634→rewrite the website copy.
+  1635→replace the current layout.
+  1636→remove existing functionality.
+  1637→add fake-live product claims.
+  1638→42. CREATE A MOTION INVENTORY
+  1639→Create:
+  1640→docs/MOTION_SYSTEM.md
+  1641→Document:
+  1642→Motion principles.
+  1643→Timing tokens.
+  1644→Easing tokens.
+  1645→Spring presets.
+  1646→Reusable variants.
+  1647→Marketing motion map.
+  1648→Dashboard motion map.
+  1649→Reduced-motion behaviour .
+  1650→• 
+  1651→• 
+  1652→• 
+  1653→• 
+  1654→• 
+  1655→• 
+  1656→• 
+  1657→• 
+  1658→• 
+  1659→• 
+  1660→• 
+  1661→• 
+  1662→• 
+  1663→• 
+  1664→• 
+  1665→• 
+  1666→• 
+  1667→• 
+  1668→• 
+  1669→• 
+  1670→• 
+  1671→• 
+  1672→• 
+  1673→• 
+  1674→• 
+  1675→• 
+  1676→• 
+  1677→• 
+  1678→• 
+  1679→• 
+  1680→• 
+  1681→31
+  1682→
+  1683→=== PAGE 32 ===
+  1684→Performance rules.
+  1685→Animation testing checklist.
+  1686→Components using continuous animation.
+  1687→Conditions under which continuous animation pauses.
+  1688→This documentation must match the actual implementation.
+  1689→43. TESTING AND VERIFICATION
+  1690→Test at:
+  1691→1440px.
+  1692→1280px.
+  1693→1024px.
+  1694→768px.
+  1695→430px.
+  1696→390px.
+  1697→360px.
+  1698→Verify:
+  1699→Marketing entrance sequence.
+  1700→Header scroll state.
+  1701→Mobile navigation.
+  1702→Hero workflow loop.
+  1703→Section reveals.
+  1704→Dashboard navigation.
+  1705→Sidebar collapse.
+  1706→Inbox filtering.
+  1707→Conversation switching.
+  1708→New message insertion.
+  1709→Composer expansion.
+  1710→Context-panel opening.
+  1711→Call simulation.
+  1712→Calendar interactions.
+  1713→AI-agent tabs.
+  1714→Voice preview.
+  1715→Knowledge syncing.
+  1716→Automation execution.
+  1717→Integration states.
+  1718→Modals.
+  1719→Drawers.
+  1720→Toasts.
+  1721→Reduced motion.
+  1722→Keyboard navigation.
+  1723→Run:
+  1724→• 
+  1725→• 
+  1726→• 
+  1727→• 
+  1728→• 
+  1729→• 
+  1730→• 
+  1731→• 
+  1732→• 
+  1733→• 
+  1734→• 
+  1735→• 
+  1736→• 
+  1737→• 
+  1738→• 
+  1739→• 
+  1740→• 
+  1741→• 
+  1742→• 
+  1743→• 
+  1744→• 
+  1745→• 
+  1746→• 
+  1747→• 
+  1748→• 
+  1749→• 
+  1750→• 
+  1751→• 
+  1752→• 
+  1753→• 
+  1754→• 
+  1755→• 
+  1756→• 
+  1757→• 
+  1758→• 
+  1759→32
+  1760→
+  1761→=== PAGE 33 ===
+  1762→bunrunlint
+  1763→bunruntypecheck
+  1764→bunruntest
+  1765→bunrunbuild
+  1766→Also perform browser testing.
+  1767→Check:
+  1768→Browser console.
+  1769→React warnings.
+  1770→Hydration warnings.
+  1771→Layout shifts.
+  1772→Overflow.
+  1773→Stuck animations.
+  1774→Offscreen animation.
+  1775→Mobile touch interactions.
+  1776→Focus states.
+  1777→Escape-key behaviour .
+  1778→Reduced-motion behaviour .
+  1779→Animation after browser Back and Forward.
+  1780→Tab visibility pausing.
+  1781→Fix all problems before completion.
+  1782→44. MOTION QUALITY BAR
+  1783→The animation pass is successful only when:
+  1784→The hero explains the product visually.
+  1785→The marketing page feels premium while remaining readable.
+  1786→Dashboard navigation feels immediate.
+  1787→Panels open and close naturally.
+  1788→Filtered lists reorganize smoothly.
+  1789→New messages feel live.
+  1790→AI processing has understandable states.
+  1791→Calls feel active rather than decorative.
+  1792→Appointment booking feels continuous.
+  1793→Human handoff feels trustworthy.
+  1794→Charts respond to data changes.
+  1795→Mobile motion feels native.
+  1796→Reduced-motion mode works.
+  1797→Performance remains smooth.
+  1798→No functionality is broken.
+  1799→No animation exists merely to show that animation was added.
+  1800→The goal is not “more animation.”
+  1801→• 
+  1802→• 
+  1803→• 
+  1804→• 
+  1805→• 
+  1806→• 
+  1807→• 
+  1808→• 
+  1809→• 
+  1810→• 
+  1811→• 
+  1812→• 
+  1813→• 
+  1814→• 
+  1815→• 
+  1816→• 
+  1817→• 
+  1818→• 
+  1819→• 
+  1820→• 
+  1821→• 
+  1822→• 
+  1823→• 
+  1824→• 
+  1825→• 
+  1826→• 
+  1827→• 
+  1828→• 
+  1829→• 
+  1830→33
+  1831→
+  1832→=== PAGE 34 ===
+  1833→The goal is:
+  1834→Every movement should explain state, reinforce hierarchy, preserve context or
+  1835→acknowledge an action.
+  1836→45. FINAL RESPONSE
+  1837→When finished, return:
+  1838→Branch or commit created.
+  1839→Motion package changes.
+  1840→Existing animations removed or replaced.
+  1841→Reusable motion primitives created.
+  1842→Marketing animations implemented.
+  1843→Dashboard animations implemented.
+  1844→Reduced-motion support implemented.
+  1845→Performance improvements.
+  1846→Files changed.
+  1847→Exact test commands executed.
+  1848→Test results.
+  1849→Production-build result.
+  1850→Browser sizes tested.
+  1851→Remaining static areas and why they were intentionally left static.
+  1852→Any genuine limitations.
+  1853→Do not describe planned work as completed.
+  1854→Do not stop after animating only the homepage.
+  1855→Do not claim “all animations complete” without manually checking the dashboard.
+  1856→1. 
+  1857→2. 
+  1858→3. 
+  1859→4. 
+  1860→5. 
+  1861→6. 
+  1862→7. 
+  1863→8. 
+  1864→9. 
+  1865→10. 
+  1866→11. 
+  1867→12. 
+  1868→13. 
+  1869→14. 
+  1870→15. 
+  1871→34

@@ -1,0 +1,1871 @@
+Total pages: 34
+---
+=== PAGE 1 ===
+CLOUDSUN — PREMIUM MOTION, ANIMATION
+AND INTERACTION OVERHAUL
+You are working inside the existing CloudSun repository:
+https://github.com/hello-aditya-dev/cloudsun
+Live deployment:
+https://cloudsun-aditya.vercel.app/
+CloudSun is an omnichannel AI front desk and client inbox for phone calls, email, WhatsApp, website
+chat and appointment scheduling.
+The website and dashboard are visually strong, but they currently feel too static.
+Your task is to create a complete, production-quality motion system across the marketing website,
+onboarding experience and application dashboard.
+Do not redesign the website.
+Do not change the brand.
+Do not rewrite the content.
+Do not change the product architecture unless a small structural change is necessary for correct
+animation.
+Do not add random animations to every element.
+The objective is to make CloudSun feel:
+Alive.
+Responsive.
+Premium.
+Intelligent.
+Calm.
+Highly polished.
+Deliberate.
+Comparable to a high-end SaaS product designed by an elite product studio.
+The result must feel more expensive without becoming flashy, distracting or slow.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1
+
+=== PAGE 2 ===
+1. PRIMARY MOTION TECHNOLOGY
+Use the current Motion for React package.
+Install:
+bunaddmotion
+Import from:
+import{
+motion,
+m,
+AnimatePresence,
+LayoutGroup,
+LazyMotion,
+domAnimation,
+MotionConfig,
+useAnimate,
+useInView,
+useMotionValue,
+useMotionTemplate,
+useReducedMotion,
+useScroll,
+useSpring,
+useTransform,
+} from"motion/react";
+Do not maintain both framer-motion and motion unless an existing dependency genuinely
+requires the old package.
+If the project does not use framer-motion directly after migration:
+bunremoveframer-motion
+Do not install multiple animation libraries that perform the same job.
+Use:
+Motion for React for stateful, layout, gesture, presence and scroll animation.
+CSS transitions for simple colour and border changes.
+CSS keyframes only for tiny, self-contained decorative loops.
+The Web Animations API only where Motion is unnecessary.
+Do not add GSAP unless there is a specific animation that Motion cannot implement cleanly.
+• 
+• 
+• 
+• 
+2
+
+=== PAGE 3 ===
+2. FIRST AUDIT THE EXISTING MOTION
+Before editing:
+Inspect the complete repository.
+Find all existing animation code.
+Find:
+CSS keyframes.
+setInterval animation loops.
+setTimeout animation simulations.
+Hover transitions.
+Existing Framer Motion imports.
+Transform-based animation.
+Loading states.
+Animated status indicators.
+Open the local website in a real browser .
+Record the current animation behaviour .
+Capture desktop and mobile screenshots.
+Check the browser console.
+Check for hydration warnings.
+Check for layout shifts.
+Identify animation that should be:
+Retained.
+Improved.
+Replaced.
+Removed.
+Do not blindly layer new motion on top of existing effects.
+Consolidate overlapping animation systems.
+3. CREATE A CENTRAL MOTION SYSTEM
+Create:
+src/lib/motion/
+  tokens.ts
+  variants.ts
+  transitions.ts
+  reduced-motion.ts
+Do not scatter arbitrary durations and easing curves across dozens of files.
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+13. 
+14. 
+15. 
+16. 
+17. 
+18. 
+◦ 
+◦ 
+◦ 
+◦ 
+3
+
+=== PAGE 4 ===
+Motion timing tokens
+Use a restrained timing system:
+exportconstmotionDuration= {
+instant: 0.1,
+micro: 0.16,
+fast: 0.22,
+standard: 0.32,
+deliberate: 0.48,
+reveal: 0.65,
+} asconst;
+Easing tokens
+Use a premium ease-out curve for most interface animation:
+exportconstmotionEase= {
+out: [0.16, 1, 0.3, 1],
+inOut: [0.65, 0, 0.35, 1],
+soft: [0.22, 1, 0.36, 1],
+} asconst;
+Spring tokens
+Create reusable springs:
+exportconstmotionSpring= {
+soft: {
+type: "spring",
+stiffness: 260,
+damping: 30,
+mass: 0.8,
+},
+snappy: {
+type: "spring",
+stiffness: 420,
+damping: 32,
+mass: 0.65,
+},
+panel: {
+type: "spring",
+stiffness: 300,
+damping: 34,
+mass: 0.9,
+4
+
+=== PAGE 5 ===
+},
+} asconst;
+Tune these values in the browser .
+Do not use exaggerated elastic bouncing.
+CloudSun is a professional business product, not a gaming interface.
+4. GLOBAL MOTION PROVIDER
+Wrap animated product areas in a shared Motion configuration.
+Use:
+MotionConfig.
+LazyMotion.
+domAnimation.
+reducedMotion="user" where appropriate.
+Prefer the smaller m component inside heavily animated sections when using LazyMotion.
+Do not convert the complete Next.js application into one giant client component.
+Keep client boundaries narrow.
+Only components that require browser animation state should use "use client".
+5. GLOBAL MOTION LANGUAGE
+CloudSun’s motion language should communicate:
+AI processing.
+Messages arriving.
+Information connecting.
+Human handoff.
+Appointments being confirmed.
+Calls moving through stages.
+Panels reorganizing smoothly.
+Data becoming actionable.
+The application must not feel like objects are randomly floating.
+Use four primary motion patterns:
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+5
+
+=== PAGE 6 ===
+A. Reveal
+For content entering the viewport:
+Opacity from 0 to 1.
+Vertical offset between 12px and 28px.
+Optional very subtle blur from 4px to 0.
+Duration between 0.45 and 0.65 seconds.
+Stagger between 50ms and 90ms.
+Run once for normal marketing sections.
+Do not make every paragraph independently animate.
+Animate logical content groups.
+B. Reflow
+For filters, tabs, cards, panels and changing data:
+Use layout.
+Use layoutId.
+Use LayoutGroup.
+Preserve spatial continuity.
+Avoid elements suddenly teleporting.
+C. Presence
+For drawers, modals, menus, context panels and conditional content:
+Use AnimatePresence.
+Animate both entrance and exit.
+Keep exit animation short.
+Do not leave invisible elements blocking pointer input.
+D. Feedback
+For hover , tap, selection, success and loading:
+Buttons depress slightly on tap.
+Cards lift subtly on hover .
+Selected navigation indicators glide.
+Success states confirm actions.
+Loading states feel responsive.
+Avoid constant pulsing where no action is occurring.
+6. MARKETING HEADER
+Improve the marketing header .
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+6
+
+=== PAGE 7 ===
+Initial state
+At the top of the page:
+Slightly taller .
+Mostly transparent warm background.
+Light border .
+Spacious navigation.
+Scrolled state
+After approximately 20–40px scroll:
+Height becomes slightly more compact.
+Background opacity increases.
+Backdrop blur becomes stronger .
+Bottom border becomes more visible.
+Shadow appears subtly.
+Logo and navigation remain stable.
+Do not cause layout shift.
+Use scroll state rather than a heavy continuous animation.
+Navigation links
+On hover:
+Text colour transitions.
+A small underline or dot enters using layoutId.
+The active or hovered indicator should move smoothly between links.
+Do not make each link jump vertically.
+Mobile menu
+Use AnimatePresence.
+Animation:
+Backdrop fades in.
+Menu panel slides down approximately 12–18px while fading.
+Navigation items enter with a short stagger .
+Menu icon morphs or rotates cleanly between Menu and Close.
+Closing must include an exit animation.
+Lock body scroll while open.
+7. HERO SECTION
+The hero is the most important motion area.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+7
+
+=== PAGE 8 ===
+It must communicate the complete CloudSun workflow without overwhelming the user .
+Hero entrance sequence
+Animate in this order:
+Product badge.
+First headline line.
+Highlighted headline line.
+Supporting paragraph.
+Primary and secondary buttons.
+Channel list.
+Product preview.
+Use a coordinated parent variant with staggered children.
+The hero should appear quickly. Do not make users wait through a cinematic intro.
+Recommended total sequence time:
+Approximately 900–1,200ms.
+Primary CTA should become usable almost immediately.
+Headline reveal
+Use a refined mask or clipping reveal.
+Possible implementation:
+<divclassName="overflow-hidden">
+<motion.span
+initial={{y: "110%"}}
+animate={{y: 0 }}
+>
+Everyclientconversation.
+</motion.span>
+</div>
+Use this only for the primary hero headline.
+Do not apply split-character animation to body copy.
+Do not create an artificial typewriter effect for the main headline.
+Hero product preview
+The animated preview should become the signature motion piece.
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+• 
+• 
+8
+
+=== PAGE 9 ===
+Replace the rigid step switching with a coordinated Motion sequence.
+Animate the process:
+Incoming call arrives.
+Caller card expands.
+Live transcript appears word group by word group.
+AI status changes from listening to processing.
+Calendar availability panel slides into view.
+Available time is selected.
+Appointment card transforms into confirmed state.
+WhatsApp confirmation enters.
+Unified inbox item appears.
+The complete flow resets gently.
+Use:
+AnimatePresence.
+layout.
+layoutId.
+useAnimate.
+Controlled variants.
+Shared element transitions where useful.
+Do not make cards disappear abruptly.
+Hero preview details
+Animate:
+Incoming call ring.
+Caller avatar glow.
+Live waveform.
+Transcript cursor .
+AI listening and speaking states.
+Tool activity.
+Calendar check.
+Confirmation checkmark.
+Message-delivery ticks.
+Inbox unread indicator .
+Keep the animation readable.
+Each step should remain visible long enough to understand.
+Pause the loop when:
+The section is outside the viewport.
+The browser tab is hidden.
+Reduced motion is enabled.
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+9
+
+=== PAGE 10 ===
+Hero CTA buttons
+Primary button:
+Slight elevation on hover .
+Arrow moves 3–4px to the right.
+Tap scale approximately 0.98.
+Focus state remains visible.
+Secondary button:
+Play icon transitions subtly.
+Border and background respond to hover .
+Do not spin the icon continuously.
+8. SECTION REVEALS
+Create reusable components:
+<Reveal/>
+<RevealGroup/>
+<StaggerList/>
+<SectionHeadingReveal/>
+Use these across the marketing site.
+Default section reveal:
+initial: {
+opacity: 0,
+y: 24,
+}
+whileInView: {
+opacity: 1,
+y: 0,
+}
+viewport: {
+once: true,
+amount: 0.2,
+}
+Do not use exactly the same animation for every section.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+10
+
+=== PAGE 11 ===
+Create controlled variations:
+Text reveals upward.
+Product panels reveal with scale from 0.985 to 1.
+Timeline elements progress horizontally.
+Cards stagger .
+Numerical metrics count upward.
+Keep all variations within the same motion language.
+9. CHANNEL OVERVIEW
+For phone, email, WhatsApp and website-chat cards:
+Stagger cards into view.
+Draw or reveal the channel icon.
+Animate the connection line between cards.
+On hover , lift the selected card by approximately 3–5px.
+Increase border definition.
+Shift icon background subtly.
+Reveal one small secondary detail.
+Do not enlarge cards aggressively.
+On mobile:
+Disable hover-specific transformations.
+Use tap feedback only.
+Ensure cards remain stable while scrolling.
+10. UNIFIED CLIENT TIMELINE
+This section should visually communicate that multiple channels belong to one client.
+Animate:
+Timeline path drawing.
+Phone event entering first.
+WhatsApp continuation joining the timeline.
+Email response joining afterward.
+Contact profile consolidating these identities.
+Final unified customer card becoming the focal point.
+Use SVG path animation or a transform-based progress line.
+Use layoutId for channel events that move into the unified customer record.
+Do not use an excessively complex canvas animation.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+11
+
+=== PAGE 12 ===
+11. AI CAPABILITIES SECTION
+For the AI capability cards:
+Reveal cards in a stagger .
+Animate status changes, not just card entrances.
+Show a simulated intent being detected.
+Show confidence progressing.
+Show a tool permission being evaluated.
+Show a human-handoff decision.
+Use soft highlight movement across the active row.
+The user should understand that the AI:
+Listens.
+Understands.
+Checks business context.
+Takes controlled action.
+Hands off when required.
+Do not use generic sparkling stars as the only representation of AI.
+12. PHONE EXPERIENCE SECTION
+Create a premium voice interaction demonstration.
+Animate:
+Incoming-call panel.
+Call timer .
+Listening state.
+Waveform.
+Transcript messages.
+Intent chip.
+Sentiment state.
+Tool activity.
+Human takeover .
+Call completion.
+Summary creation.
+Waveform requirements:
+No identical bars moving in perfect synchronization.
+Use varied delays and heights.
+Keep movement calm and believable.
+Pause when the call is not active.
+Pause outside the viewport.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+12
+
+=== PAGE 13 ===
+Use reduced movement on mobile.
+Animate the call-control buttons:
+Hover or focus state.
+Tap state.
+Mute transition.
+Hold transition.
+Transfer panel.
+End-call confirmation.
+Do not animate the entire interface continuously.
+13. APPOINTMENT SECTION
+Animate calendar interactions:
+Date navigation.
+Time-slot availability.
+Selected slot.
+Conflict state.
+Appointment drawer .
+Appointment confirmation.
+Calendar event insertion.
+Confirmation message.
+Use shared layout animation when a time slot becomes an appointment card.
+Use AnimatePresence for:
+Availability panels.
+Conflict warnings.
+Success messages.
+Reschedule state.
+The booking flow should feel like one continuous interaction rather than disconnected screens.
+14. HUMAN HANDOFF SECTION
+Create a visual transition from AI handling to human handling.
+Animate:
+AI is active.
+Confidence drops or sentiment changes.
+Handoff condition appears.
+Human agent avatar enters.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1. 
+2. 
+3. 
+4. 
+13
+
+=== PAGE 14 ===
+Conversation ownership indicator moves from AI to human.
+AI summary is attached.
+Human continues the conversation.
+Use layoutId for the ownership indicator .
+This should communicate trust and control.
+Do not make the handoff appear like a system failure.
+15. KNOWLEDGE SECTION
+Animate knowledge sources as a connected system.
+Possible sequence:
+Website source appears.
+PDF source appears.
+Notion source appears.
+FAQ source appears.
+Indexing progress moves.
+A customer question appears.
+Relevant source is highlighted.
+Answer appears with citation.
+Coverage score updates.
+Use restrained progress animation.
+Do not show fake indefinite indexing.
+The sequence should complete and settle.
+16. AUTOMATION SECTION
+Animate the workflow logically:
+Trigger activates.
+Condition is checked.
+AI step processes.
+Approval step waits.
+Human approves.
+Action completes.
+Activity log records success.
+Animate the connection line between steps.
+Use status colour and icon changes.
+5. 
+6. 
+7. 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+14
+
+=== PAGE 15 ===
+Do not make every node bounce.
+The motion should resemble a system executing work.
+17. ANALYTICS SECTION
+Animate analytics when the section enters the viewport.
+Implement:
+Number count-up.
+Line chart drawing.
+Bar chart growth.
+Donut or progress-ring completion.
+Comparison badge entrance.
+Tooltip fade and movement.
+Do not animate from zero every time the user scrolls away and back.
+Marketing analytics should animate once.
+Dashboard analytics may animate when the selected time range changes.
+Use realistic duration:
+Counters: 500–900ms.
+Bars: 400–700ms.
+Chart lines: 700–1,000ms.
+Avoid excessive delays between chart elements.
+18. PRICING SECTION
+Pricing cards should feel interactive without becoming playful.
+On reveal:
+Cards enter with slight stagger .
+Highlighted plan settles last or gains a subtle outline emphasis.
+On hover:
+Border becomes clearer .
+Card rises 3–4px.
+Shadow becomes slightly stronger .
+CTA arrow shifts.
+Feature checkmarks respond subtly.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+15
+
+=== PAGE 16 ===
+Do not make the featured plan permanently pulse.
+Do not use large 3D tilt.
+19. FINAL CTA
+Create one restrained ambient animation:
+Slow gradient movement.
+Very subtle background glow.
+A few connection lines or signal points.
+CTA button feedback.
+Keep text perfectly readable.
+Disable or greatly simplify ambient movement for reduced-motion users.
+20. DASHBOARD PAGE AND SECTION
+TRANSITIONS
+The dashboard must feel like a real application, not a collection of pages.
+When navigating between dashboard sections:
+Previous content exits with a 6–10px horizontal or vertical offset.
+New content enters from the corresponding direction.
+Opacity transition remains fast.
+Total navigation transition should be approximately 180–280ms.
+Navigation must never feel delayed.
+Do not animate the entire fixed application shell.
+Keep these stable:
+Top bar .
+Sidebar .
+Mobile bottom navigation.
+Animate only the main content region.
+Use AnimatePresence with stable keys.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+16
+
+=== PAGE 17 ===
+21. SIDEBAR
+Improve sidebar motion.
+Collapse and expand
+Use layout animation for:
+Width.
+Logo area.
+Workspace switcher .
+Labels.
+Badges.
+Channel-health area.
+Requirements:
+Icons stay spatially stable.
+Text fades rather than being abruptly removed.
+Tooltip appears for collapsed navigation.
+Main content reflows smoothly.
+No horizontal shaking.
+Active navigation
+Use one layoutId active indicator .
+The active background or left indicator should glide between menu items.
+Do not create separate enter animations for every selected item.
+Notification badges
+When a badge value changes:
+Scale in slightly.
+Crossfade number .
+Avoid continuous pulsing.
+22. TOP BAR
+Animate:
+Search opening into command palette.
+Notification panel.
+Help panel.
+User menu.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+17
+
+=== PAGE 18 ===
+AI status changes.
+Workspace switcher .
+Command palette:
+Backdrop fades.
+Dialog scales from approximately 0.98 to 1.
+Results stagger very slightly.
+Selection highlight uses layout animation.
+Closing includes exit animation.
+Do not animate the search field continuously.
+23. OVERVIEW DASHBOARD
+Add meaningful animation to:
+KPI counters.
+Urgent-conversation cards.
+Channel-health rows.
+Upcoming appointments.
+AI-action feed.
+Charts.
+Status changes.
+Use stagger only for the first page load.
+When filters change:
+Use layout animation.
+Crossfade changing numbers.
+Animate chart changes.
+Do not replay the complete page entrance.
+Create a subtle live activity indicator for genuinely simulated live data.
+Clearly label it as demo activity.
+24. UNIFIED INBOX
+The inbox should receive the most detailed microinteraction work.
+Conversation list
+Animate:
+Selected-row background using layoutId.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+18
+
+=== PAGE 19 ===
+Unread dot appearing and disappearing.
+Conversation reordering using layout.
+New message preview update.
+Assignment badge change.
+Priority change.
+Filtered rows entering and exiting.
+Empty state transition.
+Do not animate rows from large distances.
+Opening a conversation
+Use:
+Fast crossfade.
+8–12px directional movement.
+Context panel updates.
+Shared contact-avatar transition where appropriate.
+Keep the interface responsive.
+Message thread
+Animate new messages:
+Opacity.
+8–12px vertical entry.
+Slight scale from 0.99.
+Delivery-state transition.
+Animate:
+Customer messages.
+AI messages.
+Human messages.
+Internal notes.
+System events.
+Each message type should have a related but distinct entrance.
+Do not replay entrance animations for the complete existing conversation every time it opens.
+Only animate newly inserted messages strongly.
+AI draft
+When AI draft is selected:
+Button enters processing state.
+Small progress indication appears.
+Composer content appears naturally.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1. 
+2. 
+3. 
+19
+
+=== PAGE 20 ===
+AI attribution appears.
+Rewrite tools become available.
+Do not make text appear instantly after a fixed delay.
+Use a controlled line or paragraph reveal.
+Do not use a slow character-by-character typewriter for full emails.
+Composer
+Animate:
+Reply and internal-note mode.
+Channel switcher .
+Attachment preview.
+Approval state.
+Scheduled-send state.
+Send success.
+Validation errors.
+Composer expansion.
+Use layout animation when the composer grows.
+Tap feedback on Send must remain immediate.
+Context panel
+Use AnimatePresence.
+When opening:
+Slide 16–24px from the right.
+Fade simultaneously.
+Main conversation reflows smoothly.
+When closing:
+Shorter exit.
+No sudden width jump.
+25. CALLS DASHBOARD
+Improve:
+Calls-list filtering.
+Selected-call transition.
+Live-call mode.
+4. 
+5. 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+20
+
+=== PAGE 21 ===
+Call controls.
+Transcript updates.
+Recording playback.
+Quality flags.
+Follow-up creation.
+Live-call mode
+Animate:
+Incoming caller panel.
+Call connection.
+Call timer .
+Consent state.
+Listening and speaking transition.
+Transcript appearance.
+Detected intent.
+Sentiment update.
+Calendar action.
+Human takeover .
+End-call state.
+Summary generation.
+Avoid fake random motion.
+All movement should correspond to a call state.
+Recording player
+Implement real visual progress animation for the demonstration player .
+The progress indicator should move when Play is selected.
+Pause should stop progress.
+Restart when reaching the end.
+Clearly label it as demonstration audio unless a real local audio file is included.
+26. CONTACTS
+Animate:
+List filtering.
+Search results.
+Lead-stage changes.
+Contact selection.
+Contact drawer or page.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+21
+
+=== PAGE 22 ===
+Timeline entries.
+Notes saving.
+Tag additions.
+Identity merge dialog.
+Use layout when contacts reorder after status or stage changes.
+Do not apply hover movement to every table row.
+Use subtle background and icon feedback instead.
+27. CALENDAR DASHBOARD
+Animate:
+Day, week and agenda view changes.
+Date navigation.
+Today selection.
+Appointment insertion.
+Appointment drag or reschedule.
+Conflict warning.
+Appointment detail drawer .
+Time-slot hover and selection.
+Team-filter changes.
+Use layout animation to move appointment blocks.
+Use AnimatePresence for drawers and warnings.
+Do not animate every time-grid line.
+28. AI FRONT DESK BUILDER
+Animate:
+Tab changes.
+Active-tab indicator .
+Draft status.
+Save state.
+Publish state.
+Permission-level changes.
+Confidence sliders.
+Voice testing.
+Pronunciation rows.
+Playground responses.
+Retrieved knowledge.
+Tool-call activity.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+22
+
+=== PAGE 23 ===
+Handoff decision.
+Tabs
+Use a shared layoutId indicator .
+Tab content should:
+Fade.
+Move approximately 8px.
+Complete in under 250ms.
+Do not make users wait between configuration tabs.
+Permission controls
+When permission changes:
+Status colour transitions.
+Icon transitions.
+Explanation updates.
+Approval warning enters when necessary.
+Publish
+Create states:
+Unsaved.
+Saving.
+Saved.
+Publishing.
+Published.
+Error .
+Use clear feedback, not decorative animation.
+Voice preview
+When Test voice is selected:
+Button switches to playing.
+Waveform animates.
+Progress appears.
+Stop control is available.
+Waveform stops afterward.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+• 
+• 
+• 
+• 
+• 
+23
+
+=== PAGE 24 ===
+29. KNOWLEDGE DASHBOARD
+Animate:
+Source addition.
+Source removal.
+Sync state.
+Indexing progress.
+Search filtering.
+Source-status changes.
+Citation preview.
+Conflict warnings.
+Coverage-score updates.
+New sources should enter with layout animation.
+Removed sources should exit cleanly.
+Do not animate indefinite progress loops without a clear state label.
+30. AUTOMATIONS DASHBOARD
+Animate:
+Workflow creation.
+Step insertion.
+Step removal.
+Reordering.
+Enabling and disabling.
+Test execution.
+Approval state.
+Successful completion.
+Error state.
+Activity-log additions.
+Use Reorder or dnd-kit together with Motion layout animation where appropriate.
+Drag requirements:
+Lift selected step.
+Add shadow.
+Slight scale increase.
+Smoothly move surrounding steps.
+Return cleanly when dropped.
+Do not use large rotation during drag.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+24
+
+=== PAGE 25 ===
+31. ANALYTICS DASHBOARD
+Animate data changes caused by:
+Date-range changes.
+Channel filters.
+Team filters.
+Comparison-period changes.
+Use:
+Number interpolation.
+Chart morph or crossfade.
+Bar resizing.
+Tooltip motion.
+Loading skeleton transition.
+Do not remount the complete analytics page for every filter change.
+32. INTEGRATIONS
+Animate integration lifecycle states:
+Not connected.
+Opening configuration.
+Connecting.
+Connected or simulated.
+Syncing.
+Error .
+Reauthorization required.
+Disconnected.
+Use:
+Animated status icon transition.
+Badge crossfade.
+Progress indicator .
+Modal or drawer presence.
+Success confirmation.
+Do not display a permanently spinning indicator .
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+• 
+• 
+• 
+• 
+• 
+25
+
+=== PAGE 26 ===
+33. SETTINGS, TEAM, BILLING AND AUDIT LOG
+Settings
+Animate:
+Tab indicator .
+Save confirmation.
+Toggle changes.
+Security warnings.
+Session revocation.
+Retention-setting changes.
+Team
+Animate:
+Invite modal.
+New member insertion.
+Availability change.
+Capacity bars.
+Role update.
+Assignment-rule toggles.
+Billing
+Animate:
+Usage bars.
+Invoice drawer .
+Plan comparison modal.
+Currency and plan transitions.
+Do not create celebratory confetti for ordinary billing actions.
+Audit log
+Animate:
+New activity entries.
+Filter changes.
+Expanded details.
+Export-state feedback.
+Keep audit data calm and readable.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+26
+
+=== PAGE 27 ===
+34. MODALS, DRAWERS, POPOVERS AND TOASTS
+Create consistent presence variants.
+Modal
+Backdrop opacity: 0 → 1.
+Dialog opacity: 0 → 1.
+Dialog scale: 0.98 → 1.
+Dialog Y: 8px → 0.
+Use short exit.
+Drawer
+Slide from correct edge.
+Background fades.
+Use spring transition.
+Do not overshoot heavily.
+Dropdown and popover
+Small opacity transition.
+Y offset between 4px and 8px.
+Duration below 180ms.
+Correct transform origin.
+Toast
+Enter from bottom-right on desktop.
+Enter from bottom-centre on mobile.
+Swipe dismissal where supported.
+Animate progress only when the toast is timed.
+Do not create separate random motion styles for each component.
+35. BUTTON AND CARD MICROINTERACTIONS
+Buttons
+All primary interactive buttons should have:
+Hover response.
+Tap response.
+Focus-visible state.
+Disabled state.
+Loading state.
+Success state where relevant.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+27
+
+=== PAGE 28 ===
+Recommended:
+whileHover={{y: -1 }}
+whileTap={{scale: 0.98}}
+Use selectively.
+Do not add scale animation to tiny icon buttons if it makes them visually unstable.
+Cards
+Do not make every card lift.
+Only interactive cards should respond.
+Interactive-card hover:
+Y: -2px to -4px.
+Border definition increases.
+Shadow increases subtly.
+Internal arrow or icon shifts.
+Non-interactive information cards should remain stable.
+36. CURSOR-RESPONSIVE EFFECTS
+Use cursor-following effects very sparingly.
+Allowed locations:
+Hero product preview.
+One or two major marketing feature cards.
+Possible effect:
+Very subtle radial highlight following pointer position.
+Minimal card perspective.
+Maximum rotation approximately 1–1.5 degrees.
+Do not add cursor-following effects to:
+Dashboard tables.
+Inbox rows.
+Form controls.
+Calendar cells.
+Mobile devices.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+28
+
+=== PAGE 29 ===
+Disable tilt for:
+Reduced-motion users.
+Touch devices.
+Low-power contexts where detected.
+37. SCROLL-LINKED MOTION
+Use scroll-linked animation only where it adds meaning.
+Allowed:
+Thin page-progress indicator .
+Slight hero-preview parallax.
+Timeline progression.
+Section visual progressing as the explanation changes.
+Not allowed:
+Scroll-jacking.
+Forced smooth scrolling.
+Large text moving at different speeds.
+Sections pinned for excessive durations.
+Content becoming unreadable while scrolling.
+Large continuous blur effects.
+Use useScroll, useTransform and useSpring.
+Keep parallax travel below approximately 40px.
+38. REDUCED MOTION
+Accessibility is mandatory.
+Use:
+useReducedMotion.
+MotionConfig.
+prefers-reduced-motion.
+When reduced motion is enabled:
+Remove parallax.
+Remove large translations.
+Remove continuous decorative loops.
+Disable cursor tilt.
+Disable repeated waveform animation unless required to communicate live call state.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+29
+
+=== PAGE 30 ===
+Replace complex transitions with short opacity changes.
+Keep all content and actions available.
+Do not remove essential status feedback.
+Test the application with reduced motion enabled at operating-system level.
+39. PERFORMANCE REQUIREMENTS
+Animation must improve perceived quality without degrading performance.
+Requirements:
+Prefer transform and opacity.
+Avoid frequent layout-triggering property animation.
+Use Motion layout animation for measured reflow.
+Avoid animating large blurred layers continuously.
+Avoid large full-screen filters.
+Pause offscreen loops.
+Pause hidden-tab animations.
+Do not attach one scroll listener per card.
+Avoid unnecessary React state updates every animation frame.
+Use Motion values for frame-sensitive animation.
+Use LazyMotion.
+Lazy-load heavy demonstration sections.
+Memoize expensive static visual components only where measurements show benefit.
+Prevent unnecessary list re-renders in inbox and calls.
+Avoid introducing hydration errors.
+Avoid cumulative layout shift.
+Maintain smooth scrolling.
+Do not use JavaScript intervals for simple continuous animation when Motion or CSS can handle it.
+40. MOBILE MOTION
+Mobile motion must not simply copy desktop motion.
+Requirements:
+Shorter durations.
+Smaller distances.
+No hover assumptions.
+No cursor effects.
+Drawers should feel touch-native.
+Bottom navigation indicator should glide.
+Full-screen conversation transitions should reflect forward and backward navigation.
+Keep keyboard and composer behaviour stable.
+Do not animate elements beneath the software keyboard.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+30
+
+=== PAGE 31 ===
+Avoid large fixed animated backgrounds.
+Respect low-power devices.
+Mobile transitions should generally complete within 160–260ms.
+41. DO NOT DO THESE THINGS
+Do not:
+Add animation to every text element.
+Animate every card on every scroll.
+Use excessive scale effects.
+Use exaggerated spring bouncing.
+Add random floating objects.
+Add large glowing orbs everywhere.
+Add a custom cursor to the dashboard.
+Add scroll-jacking.
+Add long page transitions.
+Animate large blur filters continuously.
+Use typewriter animation for large paragraphs.
+Make the user wait for animation before interacting.
+Hide information behind hover-only states.
+break keyboard navigation.
+Ignore reduced-motion preferences.
+install several competing animation packages.
+change CloudSun’s colour palette.
+rewrite the website copy.
+replace the current layout.
+remove existing functionality.
+add fake-live product claims.
+42. CREATE A MOTION INVENTORY
+Create:
+docs/MOTION_SYSTEM.md
+Document:
+Motion principles.
+Timing tokens.
+Easing tokens.
+Spring presets.
+Reusable variants.
+Marketing motion map.
+Dashboard motion map.
+Reduced-motion behaviour .
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+31
+
+=== PAGE 32 ===
+Performance rules.
+Animation testing checklist.
+Components using continuous animation.
+Conditions under which continuous animation pauses.
+This documentation must match the actual implementation.
+43. TESTING AND VERIFICATION
+Test at:
+1440px.
+1280px.
+1024px.
+768px.
+430px.
+390px.
+360px.
+Verify:
+Marketing entrance sequence.
+Header scroll state.
+Mobile navigation.
+Hero workflow loop.
+Section reveals.
+Dashboard navigation.
+Sidebar collapse.
+Inbox filtering.
+Conversation switching.
+New message insertion.
+Composer expansion.
+Context-panel opening.
+Call simulation.
+Calendar interactions.
+AI-agent tabs.
+Voice preview.
+Knowledge syncing.
+Automation execution.
+Integration states.
+Modals.
+Drawers.
+Toasts.
+Reduced motion.
+Keyboard navigation.
+Run:
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+32
+
+=== PAGE 33 ===
+bunrunlint
+bunruntypecheck
+bunruntest
+bunrunbuild
+Also perform browser testing.
+Check:
+Browser console.
+React warnings.
+Hydration warnings.
+Layout shifts.
+Overflow.
+Stuck animations.
+Offscreen animation.
+Mobile touch interactions.
+Focus states.
+Escape-key behaviour .
+Reduced-motion behaviour .
+Animation after browser Back and Forward.
+Tab visibility pausing.
+Fix all problems before completion.
+44. MOTION QUALITY BAR
+The animation pass is successful only when:
+The hero explains the product visually.
+The marketing page feels premium while remaining readable.
+Dashboard navigation feels immediate.
+Panels open and close naturally.
+Filtered lists reorganize smoothly.
+New messages feel live.
+AI processing has understandable states.
+Calls feel active rather than decorative.
+Appointment booking feels continuous.
+Human handoff feels trustworthy.
+Charts respond to data changes.
+Mobile motion feels native.
+Reduced-motion mode works.
+Performance remains smooth.
+No functionality is broken.
+No animation exists merely to show that animation was added.
+The goal is not “more animation.”
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+33
+
+=== PAGE 34 ===
+The goal is:
+Every movement should explain state, reinforce hierarchy, preserve context or
+acknowledge an action.
+45. FINAL RESPONSE
+When finished, return:
+Branch or commit created.
+Motion package changes.
+Existing animations removed or replaced.
+Reusable motion primitives created.
+Marketing animations implemented.
+Dashboard animations implemented.
+Reduced-motion support implemented.
+Performance improvements.
+Files changed.
+Exact test commands executed.
+Test results.
+Production-build result.
+Browser sizes tested.
+Remaining static areas and why they were intentionally left static.
+Any genuine limitations.
+Do not describe planned work as completed.
+Do not stop after animating only the homepage.
+Do not claim “all animations complete” without manually checking the dashboard.
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+13. 
+14. 
+15. 
+34
