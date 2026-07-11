@@ -3,6 +3,7 @@ import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { MotionProvider } from "@/components/cloudsun/motion/MotionProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -56,7 +57,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${fraunces.variable} font-sans antialiased bg-background text-foreground`}
       >
-        {children}
+        <MotionProvider>
+          {children}
+        </MotionProvider>
         <Toaster />
         <SonnerToaster position="bottom-right" />
       </body>

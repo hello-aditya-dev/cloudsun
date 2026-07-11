@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
+import { m, AnimatePresence, useReducedMotion } from "motion/react";
 import { SectionScroll } from "../SectionScroll";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -318,9 +319,10 @@ export function InboxSection() {
                     {formatDateTime(messages[0]?.createdAt ?? selectedConv.lastAt)}
                   </span>
                 </div>
-                {messages.map((m) => (
-                  <MessageBubble key={m.id} message={m} />
-                ))}
+                {messages.map((m, i) => {
+                  const isNew = i === messages.length - 1 && m.id.startsWith("m_");
+                  return <MessageBubble key={m.id} message={m} isNew={isNew} />;
+                })}
               </div>
             </div>
 
@@ -372,11 +374,19 @@ export function InboxSection() {
         )}
       </div>
 
+      <AnimatePresence>
       {selectedConv && showContext && (
-        <div className="hidden w-72 shrink-0 flex-col overflow-y-auto border-l border-border bg-background scroll-thin lg:flex">
+        <m.div
+          initial={{ x: 24, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: 24, opacity: 0 }}
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] as const }}
+          className="hidden w-72 shrink-0 flex-col overflow-y-auto border-l border-border bg-background scroll-thin lg:flex"
+        >
           <ContextPanel contactId={selectedConv.contactId} />
-        </div>
+        </m.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -427,31 +437,36 @@ function ConversationListItem({ conv, active, checked, onCheck, onClick }: { con
   );
 }
 
-function MessageBubble({ message }: { message: Message }) {
+function MessageBubble({ message, isNew = false }: { message: Message; isNew?: boolean }) {
+  const reduced = useReducedMotion();
+  const entrance = !reduced && isNew
+    ? { initial: { opacity: 0, y: 10, scale: 0.99 }, animate: { opacity: 1, y: 0, scale: 1 }, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] as const } }
+    : {};
+
   if (message.kind === "handoff" || message.author === "system") {
     return (
-      <div className="flex items-center justify-center">
+      <m.div className="flex items-center justify-center" {...entrance}>
         <div className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-[11px] text-muted-foreground shadow-soft">
           <AlertTriangle className="h-3 w-3 text-[oklch(0.62_0.16_42)]" />
           {message.body}
         </div>
-      </div>
+      </m.div>
     );
   }
   if (message.kind === "note") {
     return (
-      <div className="flex justify-center">
+      <m.div className="flex justify-center" {...entrance}>
         <div className="max-w-md rounded-lg border border-amber-300/40 bg-amber-50/40 px-3 py-2 text-xs">
           <div className="mb-0.5 font-medium text-amber-900">{message.authorName}</div>
           <div className="text-amber-900/80">{message.body}</div>
         </div>
-      </div>
+      </m.div>
     );
   }
   const isCustomer = message.author === "customer";
   const isAi = message.author === "ai";
   return (
-    <div className={`flex ${isCustomer ? "justify-start" : "justify-end"}`}>
+    <m.div className={`flex ${isCustomer ? "justify-start" : "justify-end"}`} {...entrance}>
       <div className={`max-w-[75%] ${isCustomer ? "" : "text-right"}`}>
         <div className={`mb-1 flex items-center gap-1.5 text-[10px] text-muted-foreground ${isCustomer ? "" : "justify-end"}`}>
           {isAi && <Bot className="h-3 w-3 text-[oklch(0.62_0.16_42)]" />}
@@ -472,7 +487,7 @@ function MessageBubble({ message }: { message: Message }) {
           </div>
         )}
       </div>
-    </div>
+    </m.div>
   );
 }
 
@@ -502,7 +517,7 @@ function ContextPanel({ contactId }: { contactId: string }) {
         <div>
           <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Identities</div>
           {contact.identities.map((id) => (
-            <div key={id.handle} className="flex items-center gap-2 py-1 text-xs">
+            <div key={`${id.channel}-${id.handle}`} className="flex items-center gap-2 py-1 text-xs">
               <ChannelIcon id={id.channel} className="h-3 w-3 text-muted-foreground" />
               <span className="flex-1 truncate">{id.handle}</span>
               {id.verified && <CheckCircle2 className="h-3 w-3 text-[oklch(0.45_0.08_155)]" />}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { m, AnimatePresence, useReducedMotion } from "motion/react";
 import { appNav, product } from "@/config/cloudsun";
 import { workspace as demoWorkspace, team } from "@/data/demo";
 import { Icon } from "../shared/Icon";
@@ -115,11 +116,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <SidebarContent currentSection={currentSection} collapsed={collapsed} />
         </aside>
 
-        <main className="flex-1 overflow-hidden">{children}</main>
+        <main className="flex-1 overflow-hidden">
+          <AnimatedContent>{children}</AnimatedContent>
+        </main>
       </div>
 
       <MobileBottomNav currentSection={currentSection} />
 
+      <AnimatePresence>
       {mobileNavOpen && (
         <MobileSlideOver
           currentSection={currentSection}
@@ -127,6 +131,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           onClose={() => setMobileNavOpen(false)}
         />
       )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -219,7 +224,13 @@ function NavButton({ item, active, collapsed }: { item: { id: string; label: str
           : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
       } ${collapsed ? "justify-center" : ""}`}
     >
-      {active && <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r bg-[oklch(0.62_0.16_42)]" />}
+      {active && (
+        <m.span
+          layoutId="sidebar-active"
+          className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r bg-[oklch(0.62_0.16_42)]"
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+        />
+      )}
       <Icon name={item.icon} className="h-4 w-4 shrink-0" />
       {!collapsed && <span className="flex-1 truncate text-left">{item.label}</span>}
       {!collapsed && item.badge && (
@@ -242,8 +253,15 @@ function MobileBottomNav({ currentSection }: { currentSection: string }) {
           <Link
             key={item.id}
             href={href}
-            className={`flex flex-1 flex-col items-center gap-0.5 rounded-md py-1.5 text-[10px] ${active ? "text-[oklch(0.62_0.16_42)]" : "text-muted-foreground"}`}
+            className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-md py-1.5 text-[10px] ${active ? "text-[oklch(0.62_0.16_42)]" : "text-muted-foreground"}`}
           >
+            {active && (
+              <m.span
+                layoutId="mobile-nav-active"
+                className="absolute -top-1.5 h-0.5 w-8 rounded-full bg-[oklch(0.62_0.16_42)]"
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] as const }}
+              />
+            )}
             <Icon name={item.icon} className="h-4 w-4" />
             {item.label}
           </Link>
@@ -256,8 +274,21 @@ function MobileBottomNav({ currentSection }: { currentSection: string }) {
 function MobileSlideOver({ currentSection, onSection, onClose }: { currentSection: string; onSection: () => void; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 lg:hidden">
-      <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute left-0 top-0 h-full w-72 max-w-[85%] animate-fade-up border-r border-border bg-sidebar shadow-lift">
+      <m.div
+        className="absolute inset-0 bg-foreground/30 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.16 }}
+        onClick={onClose}
+      />
+      <m.div
+        className="absolute left-0 top-0 h-full w-72 max-w-[85%] border-r border-border bg-sidebar shadow-lift"
+        initial={{ x: "-100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "-100%" }}
+        transition={{ type: "spring", stiffness: 300, damping: 34, mass: 0.9 }}
+      >
         <div className="flex items-center justify-between border-b border-sidebar-border p-3">
           <Wordmark className="!text-base" />
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted">
@@ -275,7 +306,40 @@ function MobileSlideOver({ currentSection, onSection, onClose }: { currentSectio
             Back to site
           </Link>
         </div>
-      </div>
+      </m.div>
     </div>
+  );
+}
+
+/**
+ * AnimatedContent — wraps dashboard page content with a crossfade + slight
+ * directional movement on route change. Only animates the main content region;
+ * the shell (topbar, sidebar, mobile nav) stays stable.
+ */
+function AnimatedContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const reduced = useReducedMotion();
+
+  if (reduced) {
+    return (
+      <div key={pathname} className="h-full">
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <AnimatePresence mode="wait">
+      <m.div
+        key={pathname}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -6 }}
+        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+        className="h-full"
+      >
+        {children}
+      </m.div>
+    </AnimatePresence>
   );
 }
