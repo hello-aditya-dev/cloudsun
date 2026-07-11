@@ -9,14 +9,71 @@ export const product = {
   supporting:
     "Answer phone calls, manage email, respond on WhatsApp, handle website chat and book appointments from one AI-powered workspace.",
   category: "Omnichannel AI Front Desk",
-  repository: "cloudsun-eng/ai-frontdesk",
-  authorIdentity: "cloudsun-eng",
+  repository: "hello-aditya-dev/cloudsun",
+  authorIdentity: "hello-aditya-dev",
   description:
     "Omnichannel AI front desk and shared client inbox for phone calls, email, WhatsApp, website chat and appointment scheduling.",
   email: "hello@cloudsun.app",
   demoModeLabel: "Demo mode",
   currentYear: 2026,
 } as const;
+
+/**
+ * One truthful capability state model.
+ * Every channel and integration status must come from this enum.
+ * Nothing is marked "connected" without credentials and a successful health check.
+ */
+export type CapabilityState =
+  | "demo"
+  | "not_connected"
+  | "connecting"
+  | "connected"
+  | "reauthorization_required"
+  | "sync_delayed"
+  | "error"
+  | "disabled";
+
+export const capabilityLabel: Record<CapabilityState, string> = {
+  demo: "Interactive demo",
+  not_connected: "Provider not connected",
+  connecting: "Connecting…",
+  connected: "Connected",
+  reauthorization_required: "Reauthorization required",
+  sync_delayed: "Sync delayed",
+  error: "Error",
+  disabled: "Disabled",
+};
+
+export const capabilityColor: Record<CapabilityState, string> = {
+  demo: "oklch(0.70 0.12 75)",
+  not_connected: "oklch(0.5 0 0)",
+  connecting: "oklch(0.70 0.12 75)",
+  connected: "oklch(0.45 0.08 155)",
+  reauthorization_required: "oklch(0.62 0.16 42)",
+  sync_delayed: "oklch(0.70 0.12 75)",
+  error: "oklch(0.62 0.16 42)",
+  disabled: "oklch(0.5 0 0)",
+};
+
+export interface CurrencyConfig {
+  code: "USD";
+  symbol: "$";
+  locale: "en-US";
+}
+
+export const currency: CurrencyConfig = {
+  code: "USD",
+  symbol: "$",
+  locale: "en-US",
+};
+
+export function formatPrice(amount: number): string {
+  return new Intl.NumberFormat(currency.locale, {
+    style: "currency",
+    currency: currency.code,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
 
 export type ChannelId = "phone" | "email" | "whatsapp" | "webchat";
 
