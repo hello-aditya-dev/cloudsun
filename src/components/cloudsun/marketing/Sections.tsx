@@ -1,6 +1,7 @@
 "use client";
 
-import { channelList, product, pricingTiers } from "@/config/cloudsun";
+import Link from "next/link";
+import { channelList, product, pricingTiers, formatPrice } from "@/config/cloudsun";
 import { ChannelIcon } from "../shared/Channel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -689,7 +690,7 @@ export function PricingSection() {
 }
 
 /* --------------------------- Final CTA ------------------------------------ */
-export function FinalCTA({ onEnter }: { onEnter: () => void }) {
+export function FinalCTA() {
   return (
     <section className="border-t border-border/60 bg-background py-20 lg:py-28">
       <div className="mx-auto max-w-5xl px-5 lg:px-8">
@@ -706,13 +707,17 @@ export function FinalCTA({ onEnter }: { onEnter: () => void }) {
               telephony and calendar when you&apos;re ready.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Button size="lg" onClick={onEnter} className="bg-[oklch(0.62_0.16_42)] text-white hover:bg-[oklch(0.62_0.16_42)]/90">
-                Explore the dashboard
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button size="lg" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                See how it works
-              </Button>
+              <Link href="/app">
+                <Button size="lg" className="bg-[oklch(0.62_0.16_42)] text-white hover:bg-[oklch(0.62_0.16_42)]/90">
+                  Explore the dashboard
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button size="lg" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
+                  See how it works
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

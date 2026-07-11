@@ -19,12 +19,12 @@ import {
   Footer,
 } from "./Sections";
 
-export function MarketingPage({ onEnter }: { onEnter: () => void }) {
+export function MarketingPage() {
   return (
     <div className="min-h-screen bg-background">
-      <MarketingHeader onEnter={onEnter} />
+      <MarketingHeader />
       <main>
-        <Hero onEnter={onEnter} />
+        <Hero />
         <ChannelOverview />
         <UnifiedTimeline />
         <AICapabilities />
@@ -37,7 +37,7 @@ export function MarketingPage({ onEnter }: { onEnter: () => void }) {
         <SecuritySection />
         <IntegrationsSection />
         <PricingSection />
-        <FinalCTA onEnter={onEnter} />
+        <FinalCTA />
       </main>
       <Footer />
     </div>

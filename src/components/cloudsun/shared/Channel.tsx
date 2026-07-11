@@ -10,9 +10,9 @@ const iconMap: Record<ChannelId, LucideIcon> = {
   webchat: MessageSquare,
 };
 
-export function ChannelIcon({ id, className }: { id: ChannelId; className?: string }) {
+export function ChannelIcon({ id, className, style }: { id: ChannelId; className?: string; style?: React.CSSProperties }) {
   const C = iconMap[id];
-  return <C className={className} />;
+  return <C className={className} style={style} />;
 }
 
 export function ChannelBadge({

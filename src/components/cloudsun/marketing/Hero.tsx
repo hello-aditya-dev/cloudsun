@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { product, channels } from "@/config/cloudsun";
 import { Wordmark } from "../shared/Logo";
 import { ChannelIcon } from "../shared/Channel";
@@ -12,11 +13,11 @@ const flow = [
   { kind: "transcript", title: "Live transcript", body: "“I'd like to set up a review with Amara.”", icon: Sparkles },
   { kind: "calendar", title: "Checking calendar", body: "Thursday 11:00 — available", icon: CalendarCheck },
   { kind: "booked", title: "Appointment created", body: "July 14 · 11:00–11:45 · Amara", icon: CheckCircle2 },
-  { kind: "whatsapp", title: "WhatsApp confirmation sent", body: "Delivered to +91 99888 00112", icon: MessageCircle },
+  { kind: "whatsapp", title: "WhatsApp confirmation sent", body: "Simulated delivery to +91 99888 00112", icon: MessageCircle },
   { kind: "inbox", title: "Conversation unified", body: "Appears in shared inbox with full history", icon: CheckCircle2 },
 ] as const;
 
-export function Hero({ onEnter }: { onEnter: () => void }) {
+export function Hero() {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
@@ -53,14 +54,18 @@ export function Hero({ onEnter }: { onEnter: () => void }) {
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Button size="lg" onClick={onEnter} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Explore the dashboard
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button size="lg" variant="outline">
-                <Play className="mr-2 h-4 w-4" />
-                See how it works
-              </Button>
+              <Link href="/app">
+                <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                  Explore the dashboard
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button size="lg" variant="outline">
+                  <Play className="mr-2 h-4 w-4" />
+                  See how it works
+                </Button>
+              </Link>
             </div>
 
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
