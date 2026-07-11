@@ -612,7 +612,7 @@ export const messagesByConversation: Record<string, import("@/types/domain").Mes
   ],
   cv_2: [
     { id: "m1", conversationId: "cv_2", author: "customer", channel: "webchat", authorName: "Ananya Reddy", body: "Hi, do you have a couples package?", createdAt: minsAgo(18), status: "read" },
-    { id: "m2", conversationId: "cv_2", author: "ai", channel: "webchat", authorName: "CloudSun AI", body: "Hi! Yes, our couples package is two 60-minute sessions per month at ₹4,800. Would you like to book a first session?", createdAt: minsAgo(17), aiConfidence: 0.88, status: "read" },
+    { id: "m2", conversationId: "cv_2", author: "ai", channel: "webchat", authorName: "CloudSun AI", body: "Hi! Yes, our couples package is two 60-minute sessions per month at $96. Would you like to book a first session?", createdAt: minsAgo(17), aiConfidence: 0.88, status: "read" },
     { id: "m3", conversationId: "cv_2", author: "customer", channel: "webchat", authorName: "Ananya Reddy", body: "Thanks! And do you offer anything for two people?", createdAt: minsAgo(14), status: "delivered" },
   ],
   cv_4: [
@@ -911,7 +911,7 @@ export const automations: Automation[] = [
     name: "High-value lead alert",
     description: "When a new high-value lead appears, send an internal alert.",
     status: "draft",
-    trigger: "Lead value > ₹10,000",
+    trigger: "Lead value > $10,000",
     runs: 0,
     lastRun: daysAgo(30),
     steps: [
@@ -983,9 +983,9 @@ export const analytics = {
   // hourly volume (8am–8pm)
   hourlyVolume: [4, 8, 14, 22, 28, 31, 26, 19, 24, 33, 29, 21, 12],
   responseTimeSeries: [2.1, 1.9, 1.8, 1.6, 1.7, 1.5, 1.4],
-  // revenue influenced (₹ thousands, last 6 months)
+  // revenue influenced (USD thousands, last 6 months)
   revenueInfluenced: [42, 58, 71, 64, 88, 102],
-  // cost per conversation (₹)
+  // cost per conversation (USD)
   costPerConversation: 6.4,
   costPerAppointment: 31.2,
   monthlyCost: [
