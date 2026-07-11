@@ -17,9 +17,11 @@ import type {
 import {
   analytics, appointments, auditLog, automations, calls, contacts,
   conversations, integrations, knowledgeSources, messagesByConversation, team,
+  recallCases, waitlistEntries, treatmentFollowUps,
+  type RecallCase, type WaitlistEntry, type TreatmentFollowUp,
 } from "@/data/demo";
 
-const STORAGE_KEY = "cloudsun.demo.v1";
+const STORAGE_KEY = "cloudsun.demo.dental.v2";
 
 export interface DemoState {
   conversations: Conversation[];
@@ -34,6 +36,9 @@ export interface DemoState {
   aiConfig: AIConfigState;
   onboardingStep: number;
   resetAt: string;
+  recallCases: RecallCase[];
+  waitlist: WaitlistEntry[];
+  treatmentFollowUps: TreatmentFollowUp[];
 }
 
 export interface AIConfigState {
@@ -60,17 +65,17 @@ export interface AIConfigState {
 
 const defaultAIConfig: AIConfigState = {
   agentName: "Sunny",
-  role: "AI front desk receptionist",
-  businessName: "Atelier North",
-  greeting: "Thank you for calling Atelier North, this is Sunny. How can I help you today?",
-  closing: "Thank you for calling Atelier North. Have a wonderful day.",
+  role: "Dental front desk assistant",
+  businessName: "Lumen Dental Care",
+  greeting: "Thank you for calling Lumen Dental Care, this is Sunny. How can I help you today?",
+  closing: "Thank you for calling Lumen Dental Care. Have a wonderful day.",
   tone: "warm",
   formality: "balanced",
   languages: ["English"],
   pronunciationDict: [
-    { word: "Atelier", say: "ah-tel-YAY" },
-    { word: "Bélanger", say: "bay-LAN-jay" },
-    { word: "Saanvi", say: "SAHN-vee" },
+    { word: "Lumen", say: "LOO-men" },
+    { word: "Invisalign", say: "in-VIZ-uh-lin" },
+    { word: "endodontic", say: "en-doh-DON-tik" },
   ],
   minConfidence: 70,
   sentimentThreshold: 35,
@@ -98,6 +103,9 @@ function freshState(): DemoState {
     aiConfig: structuredClone(defaultAIConfig),
     onboardingStep: 0,
     resetAt: new Date().toISOString(),
+    recallCases: structuredClone(recallCases),
+    waitlist: structuredClone(waitlistEntries),
+    treatmentFollowUps: structuredClone(treatmentFollowUps),
   };
 }
 

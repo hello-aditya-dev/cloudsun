@@ -19,31 +19,32 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "CloudSun — Every client conversation, one intelligent front desk",
+  title: "CloudSun Dental — AI Front Desk for Dental Practices",
   description:
-    "CloudSun is an omnichannel AI front desk. It answers calls, manages email, responds on WhatsApp, handles website chat and books appointments — while keeping your team in control.",
+    "Manage new-patient enquiries, appointment requests, cancellations, recalls and treatment follow-up from one intelligent dental front desk.",
   keywords: [
-    "CloudSun",
-    "AI front desk",
-    "omnichannel inbox",
-    "AI receptionist",
-    "shared inbox",
+    "CloudSun Dental",
+    "dental AI front desk",
+    "dental practice management",
+    "new-patient intake",
     "appointment scheduling",
-    "WhatsApp business",
-    "call management",
+    "cancellation recovery",
+    "patient recall",
+    "treatment follow-up",
+    "dental practice software",
   ],
-  authors: [{ name: "CloudSun" }],
+  authors: [{ name: "CloudSun Dental" }],
   openGraph: {
-    title: "CloudSun — Every client conversation, one intelligent front desk",
+    title: "CloudSun Dental — AI Front Desk for Dental Practices",
     description:
-      "Answer phone calls, manage email, respond on WhatsApp, handle website chat and book appointments from one AI-powered workspace.",
-    siteName: "CloudSun",
+      "Fill your schedule without adding more pressure to your front desk. Handles new-patient enquiries, appointments, cancellations, recalls and treatment follow-up.",
+    siteName: "CloudSun Dental",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "CloudSun",
-    description: "Omnichannel AI front desk and shared client inbox.",
+    title: "CloudSun Dental",
+    description: "The AI-powered front desk for modern dental practices.",
   },
 };
 

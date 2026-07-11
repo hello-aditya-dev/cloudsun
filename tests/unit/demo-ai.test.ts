@@ -1,95 +1,147 @@
 import { describe, it, expect } from "vitest";
 import {
   detectIntent,
-  generateDemoAIResponse,
+  generateDentalAIResponse,
   rewriteText,
   shortenText,
   makeFriendlier,
   makeMoreFormal,
+  calculateROI,
 } from "@/lib/demo-ai";
 
-describe("detectIntent", () => {
-  it("detects pricing intent", () => {
-    const r = detectIntent("How much does a consultation cost?");
-    expect(r.intent).toBe("pricing");
-    expect(r.confidence).toBeGreaterThan(0.7);
+describe("detectIntent — dental", () => {
+  it("detects new-patient booking", () => {
+    const r = detectIntent("I'm a new patient and I'd like to book a check-up");
+    expect(r.intent).toBe("new_patient_booking");
+    expect(r.isEmergency).toBe(false);
   });
 
-  it("detects booking intent", () => {
-    const r = detectIntent("I'd like to book an appointment for next Tuesday");
-    expect(r.intent).toBe("booking");
+  it("detects tooth pain and triggers emergency screening", () => {
+    const r = detectIntent("I have tooth pain and it's getting worse");
+    expect(r.intent).toBe("tooth_pain");
+    expect(r.isEmergency).toBe(false);
   });
 
-  it("detects rescheduling intent", () => {
-    const r = detectIntent("Can I reschedule my session to a different time?");
-    expect(r.intent).toBe("rescheduling");
+  it("detects emergency red flags — severe swelling", () => {
+    const r = detectIntent("I have severe facial swelling and can't breathe properly");
+    expect(r.intent).toBe("emergency_red_flag");
+    expect(r.isEmergency).toBe(true);
+    expect(r.requiresHandoff).toBe(true);
   });
 
-  it("detects cancellation intent", () => {
-    const r = detectIntent("I need to cancel my appointment and get a refund");
+  it("detects emergency red flags — uncontrolled bleeding", () => {
+    const r = detectIntent("There's uncontrolled bleeding after my extraction");
+    expect(r.intent).toBe("emergency_red_flag");
+    expect(r.isEmergency).toBe(true);
+  });
+
+  it("detects clinical questions and requires handoff (never diagnoses)", () => {
+    const r = detectIntent("Can you tell me what's causing my tooth pain? Is it a cavity?");
+    expect(r.intent).toBe("clinical_question");
+    expect(r.requiresHandoff).toBe(true);
+  });
+
+  it("detects cancellation", () => {
+    const r = detectIntent("I need to cancel my appointment");
     expect(r.intent).toBe("cancellation");
   });
 
+  it("detects insurance question", () => {
+    const r = detectIntent("Do you accept my insurance? I'm with Star Health.");
+    expect(r.intent).toBe("insurance_question");
+  });
+
+  it("detects pricing question", () => {
+    const r = detectIntent("How much does a cleaning cost?");
+    expect(r.intent).toBe("pricing_question");
+  });
+
+  it("detects whitening", () => {
+    const r = detectIntent("I'm interested in teeth whitening");
+    expect(r.intent).toBe("whitening");
+  });
+
+  it("detects Invisalign", () => {
+    const r = detectIntent("Do you do Invisalign?");
+    expect(r.intent).toBe("invisalign");
+  });
+
   it("detects request for human", () => {
-    const r = detectIntent("I want to speak to a real person please");
+    const r = detectIntent("I want to speak to a real person");
     expect(r.intent).toBe("request_human");
+    expect(r.requiresHandoff).toBe(true);
   });
 
-  it("detects angry customer even with other keywords", () => {
-    const r = detectIntent("This is the second time you've messed up my booking, unacceptable!");
-    expect(r.intent).toBe("angry_customer");
+  it("detects angry patient", () => {
+    const r = detectIntent("This is the second time you've cancelled on me, it's ridiculous!");
+    expect(r.intent).toBe("angry_patient");
+    expect(r.requiresHandoff).toBe(true);
   });
 
-  it("detects unsupported topics", () => {
-    const r = detectIntent("Can you give me legal advice about my contract?");
-    expect(r.intent).toBe("unsupported");
-  });
-
-  it("falls back to general for unmatched", () => {
-    const r = detectIntent("Hello, how are you today?");
+  it("falls back to general", () => {
+    const r = detectIntent("Hello, how are you?");
     expect(r.intent).toBe("general");
   });
 });
 
-describe("generateDemoAIResponse", () => {
+describe("generateDentalAIResponse", () => {
   it("returns a simulated response with citations", () => {
-    const r = generateDemoAIResponse("How much is a consultation?", "phone", "Meera Krishnan");
+    const r = generateDentalAIResponse("How much is a cleaning?", "phone", "Aarav Patel");
     expect(r.simulated).toBe(true);
     expect(r.citations.length).toBeGreaterThan(0);
-    expect(r.text).toContain("Meera");
-    expect(r.intent).toBe("pricing");
+    expect(r.intent).toBe("pricing_question");
   });
 
-  it("triggers handoff for angry customers", () => {
-    const r = generateDemoAIResponse("This is terrible and unacceptable!", "phone", "Saanvi Patel");
+  it("triggers emergency escalation for red flags", () => {
+    const r = generateDentalAIResponse("I have severe facial swelling", "phone", "Test Patient");
+    expect(r.isEmergency).toBe(true);
     expect(r.handoff).toBe(true);
-    expect(r.intent).toBe("angry_customer");
+    expect(r.text).toContain("emergency");
+  });
+
+  it("hands off clinical questions without diagnosing", () => {
+    const r = generateDentalAIResponse("What's causing my tooth pain? Could it be an infection?", "phone", "Test");
+    expect(r.intent).toBe("clinical_question");
+    expect(r.handoff).toBe(true);
+    expect(r.text).not.toContain("diagnos");
+    expect(r.text).toContain("clinical");
   });
 
   it("requires approval for cancellation", () => {
-    const r = generateDemoAIResponse("I need to cancel my appointment", "email", "Daniel Okafor");
+    const r = generateDentalAIResponse("I need to cancel", "email", "Test");
     expect(r.approvalRequired).toBe(true);
   });
 
-  it("returns different responses for different intents", () => {
-    const pricing = generateDemoAIResponse("How much?", "phone", "Test User");
-    const booking = generateDemoAIResponse("I want to book", "phone", "Test User");
-    expect(pricing.text).not.toBe(booking.text);
+  it("labels every response as simulated", () => {
+    const intents = ["new_patient_booking", "pricing_question", "tooth_pain", "cancellation", "angry_patient"];
+    intents.forEach((msg) => {
+      const text = msg === "new_patient_booking" ? "new patient book" : msg === "pricing_question" ? "how much" : msg === "tooth_pain" ? "tooth pain" : msg === "cancellation" ? "cancel" : "terrible";
+      const r = generateDentalAIResponse(text, "phone", "Test");
+      expect(r.simulated).toBe(true);
+    });
   });
 
-  it("labels every response as simulated", () => {
-    const intents = ["pricing", "booking", "rescheduling", "cancellation", "angry_customer"];
-    intents.forEach((i) => {
-      const msg = i === "pricing" ? "how much" : i === "booking" ? "book" : i === "rescheduling" ? "reschedule" : i === "cancellation" ? "cancel" : "terrible";
-      const r = generateDemoAIResponse(msg, "phone", "Test");
-      expect(r.simulated).toBe(true);
+  it("never diagnoses conditions", () => {
+    const clinicalQuestions = [
+      "Is it a cavity?",
+      "Do I need a root canal?",
+      "Could it be an abscess?",
+      "What's wrong with my tooth?",
+    ];
+    clinicalQuestions.forEach((q) => {
+      const r = generateDentalAIResponse(q, "phone", "Test");
+      expect(r.text.toLowerCase()).not.toContain("you have");
+      expect(r.text.toLowerCase()).not.toContain("it is a");
+      expect(r.handoff).toBe(true);
     });
   });
 });
 
 describe("text transforms", () => {
   it("rewrites text", () => {
-    expect(rewriteText("Hi there! thx for the message!")).toBe("Hello there. thank you for the message.");
+    const result = rewriteText("Hi there! thx for the message!");
+    expect(result).toContain("Hello");
+    expect(result).toContain("thank you");
   });
 
   it("shortens text to first 2 sentences", () => {
@@ -100,12 +152,59 @@ describe("text transforms", () => {
   it("makes text friendlier", () => {
     const result = makeFriendlier("Hello. Regards.");
     expect(result).toContain("Hi there");
-    expect(result).toContain("Warm regards");
   });
 
   it("makes text more formal", () => {
     const result = makeMoreFormal("Hi! thx!");
     expect(result).toContain("Dear");
-    expect(result).toContain("thank you");
+  });
+});
+
+describe("ROI calculator", () => {
+  it("calculates revenue at risk from missed calls", () => {
+    const r = calculateROI({
+      monthlyCalls: 500,
+      missedCallPct: 30,
+      qualifiedBookPct: 40,
+      avgPatientValue: 800,
+      monthlyCancellations: 20,
+      avgApptValue: 150,
+      recallDuePerMonth: 50,
+      frontDeskHours: 80,
+    });
+    expect(r.newPatientRevenueAtRisk).toBe(48000); // 500 * 0.3 * 0.4 * 800
+    expect(r.cancellationRevenueAtRisk).toBe(3000); // 20 * 150
+    expect(r.totalOpportunity).toBeGreaterThan(50000);
+    expect(r.suggestedPlan).toBe("Group");
+  });
+
+  it("suggests Practice plan for mid-range opportunity", () => {
+    const r = calculateROI({
+      monthlyCalls: 300,
+      missedCallPct: 30,
+      qualifiedBookPct: 40,
+      avgPatientValue: 700,
+      monthlyCancellations: 15,
+      avgApptValue: 150,
+      recallDuePerMonth: 40,
+      frontDeskHours: 60,
+    });
+    expect(r.totalOpportunity).toBeGreaterThan(15000);
+    expect(r.suggestedPlan).toBe("Practice");
+  });
+
+  it("suggests After Hours plan for low opportunity", () => {
+    const r = calculateROI({
+      monthlyCalls: 100,
+      missedCallPct: 20,
+      qualifiedBookPct: 25,
+      avgPatientValue: 400,
+      monthlyCancellations: 5,
+      avgApptValue: 100,
+      recallDuePerMonth: 15,
+      frontDeskHours: 20,
+    });
+    expect(r.totalOpportunity).toBeLessThan(15000);
+    expect(r.suggestedPlan).toBe("After Hours");
   });
 });

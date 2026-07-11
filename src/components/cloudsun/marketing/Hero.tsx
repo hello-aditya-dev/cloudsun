@@ -72,7 +72,7 @@ export function Hero() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[oklch(0.62_0.16_42)] opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-[oklch(0.62_0.16_42)]" />
                 </span>
-                Omnichannel AI front desk · {product.demoModeLabel}
+                {product.eyebrow} · {product.demoModeLabel}
               </div>
             </m.div>
 
@@ -85,7 +85,7 @@ export function Hero() {
                   animate={reduced ? { opacity: 1 } : { y: 0 }}
                   transition={{ duration: motionDuration.deliberate, ease: motionEase.out, delay: 0.15 }}
                 >
-                  Every client conversation.
+                  Fill your schedule
                 </m.span>
               </span>
               <span className="block overflow-hidden">
@@ -95,7 +95,7 @@ export function Hero() {
                   animate={reduced ? { opacity: 1 } : { y: 0 }}
                   transition={{ duration: motionDuration.deliberate, ease: motionEase.out, delay: 0.3 }}
                 >
-                  One intelligent front desk.
+                  without more front-desk pressure.
                 </m.span>
               </span>
             </h1>
@@ -109,18 +109,18 @@ export function Hero() {
 
             <m.div className="mt-8 flex flex-wrap items-center gap-3" variants={heroChild}>
               <m.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
-                <Link href="/app">
+                <Link href="/demo">
                   <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    Explore the dashboard
+                    Try the dental front desk
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
               </m.div>
               <m.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
-                <Link href="/signup">
+                <Link href="/app">
                   <Button size="lg" variant="outline">
                     <Play className="mr-2 h-4 w-4" />
-                    See how it works
+                    Explore the practice dashboard
                   </Button>
                 </Link>
               </m.div>
@@ -133,6 +133,16 @@ export function Hero() {
                   {c.label}
                 </div>
               ))}
+            </m.div>
+
+            <m.div className="mt-6 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground" variants={heroChild}>
+              <span>Interactive demonstration.</span>
+              <span>·</span>
+              <span>No real patient data.</span>
+              <span>·</span>
+              <span>No production integrations connected.</span>
+              <span>·</span>
+              <span>Human handoff built into every workflow.</span>
             </m.div>
           </m.div>
 

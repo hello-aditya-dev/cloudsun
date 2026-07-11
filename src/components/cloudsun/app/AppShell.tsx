@@ -20,8 +20,11 @@ const sectionToPath: Record<string, string> = {
   overview: "/app",
   inbox: "/app/inbox",
   calls: "/app/calls",
-  contacts: "/app/contacts",
+  patients: "/app/patients",
   calendar: "/app/calendar",
+  recall: "/app/recall",
+  waitlist: "/app/waitlist",
+  "treatment-follow-up": "/app/treatment-follow-up",
   "ai-agent": "/app/ai-agent",
   knowledge: "/app/knowledge",
   automations: "/app/automations",
@@ -31,6 +34,8 @@ const sectionToPath: Record<string, string> = {
   settings: "/app/settings",
   billing: "/app/billing",
   "audit-log": "/app/audit-log",
+  // Backwards-compatible redirect
+  contacts: "/app/patients",
 };
 
 const titleMap: Record<string, string> = Object.fromEntries(appNav.map((n) => [n.id, n.label]));
@@ -138,6 +143,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 function SidebarContent({ currentSection, collapsed }: { currentSection: string; collapsed: boolean }) {
   const primary = appNav.filter((n) => n.group === "primary");
+  const dental = appNav.filter((n) => n.group === "dental");
   const secondary = appNav.filter((n) => n.group === "secondary");
 
   return (
@@ -165,7 +171,14 @@ function SidebarContent({ currentSection, collapsed }: { currentSection: string;
       </div>
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 scroll-thin">
-        {primary.map((item) => (
+        {primary.filter((i) => !["recall", "waitlist", "treatment-follow-up"].includes(i.id)).map((item) => (
+          <NavButton key={item.id} item={item} active={currentSection === item.id} collapsed={collapsed} />
+        ))}
+        <div className="my-3 border-t border-sidebar-border" />
+        <div className={`px-2 pb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground ${collapsed ? "hidden" : ""}`}>
+          Dental
+        </div>
+        {dental.map((item) => (
           <NavButton key={item.id} item={item} active={currentSection === item.id} collapsed={collapsed} />
         ))}
         <div className="my-3 border-t border-sidebar-border" />

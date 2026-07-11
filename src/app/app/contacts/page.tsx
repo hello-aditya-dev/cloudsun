@@ -1,5 +1,2 @@
-import { ContactsSection } from "@/components/cloudsun/app/sections/ContactsSection";
-
-export default function ContactsPage() {
-  return <ContactsSection />;
-}
+import { redirect } from "next/navigation";
+export default function ContactsRedirect() { redirect("/app/patients"); }
