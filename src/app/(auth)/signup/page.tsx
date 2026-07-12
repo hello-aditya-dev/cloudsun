@@ -23,7 +23,7 @@ export default function SignupPage() {
               <div className="space-y-3">
                 <div>
                   <Label className="text-xs">Business name</Label>
-                  <Input placeholder="Atelier North" className="mt-1" />
+                  <Input placeholder="Lumen Dental Care" className="mt-1" />
                 </div>
                 <div>
                   <Label className="text-xs">Email</Label>

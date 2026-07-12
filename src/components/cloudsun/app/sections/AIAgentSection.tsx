@@ -97,7 +97,7 @@ export function AIAgentSection() {
                   </div>
                   <div>
                     <Label className="text-xs">Business name</Label>
-                    <Input defaultValue="Atelier North" className="mt-1" />
+                    <Input defaultValue="Lumen Dental Care" className="mt-1" />
                   </div>
                   <div>
                     <Label className="text-xs">Languages</Label>
@@ -115,14 +115,14 @@ export function AIAgentSection() {
                   <Label className="text-xs">Greeting</Label>
                   <Textarea
                     className="mt-1"
-                    defaultValue="Thank you for calling Atelier North, this is Sunny. How can I help you today?"
+                    defaultValue="Thank you for calling Lumen Dental Care, this is Sunny. How can I help you today?"
                   />
                 </div>
                 <div>
                   <Label className="text-xs">Closing</Label>
                   <Textarea
                     className="mt-1"
-                    defaultValue="Thank you for calling Atelier North. Have a wonderful day."
+                    defaultValue="Thank you for calling Lumen Dental Care. Have a wonderful day."
                   />
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -159,7 +159,7 @@ export function AIAgentSection() {
                   <Bot className="h-10 w-10 text-[oklch(0.62_0.16_42)]" />
                 </div>
                 <div className="mt-4 font-serif text-xl">Sunny</div>
-                <p className="mt-1 text-xs text-muted-foreground">Atelier North&apos;s AI front desk agent. Draft version 4.</p>
+                <p className="mt-1 text-xs text-muted-foreground">Lumen Dental Care&apos;s AI front desk agent. Draft version 4.</p>
                 <div className="mt-4 space-y-2 text-xs">
                   <div className="flex justify-between"><span className="text-muted-foreground">Status</span><Badge variant="outline" className="text-[10px] gap-1"><span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.70_0.12_75)]" /> Draft</Badge></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Last published</span><span>Jul 9, 14:22</span></div>
@@ -174,7 +174,7 @@ export function AIAgentSection() {
               <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Pronunciation dictionary</div>
               <div className="space-y-1.5">
                 {[
-                  { word: "Atelier", say: "ah-tel-YAY" },
+                  { word: "Lumen", say: "LOO-men" },
                   { word: "Bélanger", say: "bay-LAN-jay" },
                   { word: "Saanvi", say: "SAHN-vee" },
                 ].map((p) => (
@@ -239,10 +239,10 @@ export function AIAgentSection() {
         <TabsContent value="channels" className="mt-4">
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { ch: "phone", icon: Phone, greeting: "Thank you for calling Atelier North, this is Sunny." },
-              { ch: "email", icon: Mail, greeting: "Hi {{name}}, thanks for reaching out to Atelier North." },
-              { ch: "whatsapp", icon: MessageCircle, greeting: "Hi! Thanks for messaging Atelier North. How can I help?" },
-              { ch: "webchat", icon: MessageSquare, greeting: "Hi there! I'm Sunny, the Atelier North assistant." },
+              { ch: "phone", icon: Phone, greeting: "Thank you for calling Lumen Dental Care, this is Sunny." },
+              { ch: "email", icon: Mail, greeting: "Hi {{name}}, thanks for reaching out to Lumen Dental Care." },
+              { ch: "whatsapp", icon: MessageCircle, greeting: "Hi! Thanks for messaging Lumen Dental Care. How can I help?" },
+              { ch: "webchat", icon: MessageSquare, greeting: "Hi there! I'm Sunny, the Lumen Dental Care assistant." },
             ].map((c) => {
               const Icon = c.icon;
               return (
@@ -358,7 +358,7 @@ export function AIAgentSection() {
               <CardContent className="space-y-3 p-6">
                 <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Escalation rules</div>
                 {[
-                  { rule: "VIP client detected", dest: "Owner (Amara)" },
+                  { rule: "VIP patient detected", dest: "Owner (Dr. Priya)" },
                   { rule: "Negative sentiment", dest: "Manager on duty" },
                   { rule: "Urgent keywords ('cancel', 'refund', 'lawyer')", dest: "Manager on duty" },
                   { rule: "Restricted topic", dest: "Human agent" },
@@ -428,7 +428,7 @@ export function AIAgentSection() {
                     ))}
                   </div>
                 </div>
-                <p className="mt-2 text-[11px] text-muted-foreground">&ldquo;Thank you for calling Atelier North, this is Sunny. How can I help you today?&rdquo;</p>
+                <p className="mt-2 text-[11px] text-muted-foreground">&ldquo;Thank you for calling Lumen Dental Care, this is Sunny. How can I help you today?&rdquo;</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 p-3">

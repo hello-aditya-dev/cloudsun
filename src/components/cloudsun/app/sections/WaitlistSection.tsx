@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useDemoState } from "@/hooks/use-demo-state";
 import { timeAgo } from "../../shared/format";
+import { demoWaitlist } from "@/lib/repositories";
 import { ListOrdered, Send, CheckCircle2, Clock, AlertTriangle, CalendarX } from "lucide-react";
 
 const acceptanceColors: Record<string, string> = {

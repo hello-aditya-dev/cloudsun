@@ -78,7 +78,7 @@ export function KnowledgeSection() {
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Citations</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {["Services & pricing PDF", "FAQ — common questions", "Atelier North website"].map((c) => (
+                  {["Services & pricing PDF", "FAQ — common questions", "Lumen Dental Care website"].map((c) => (
                     <Badge key={c} variant="outline" className="gap-1 text-[10px]">
                       <FileText className="h-2.5 w-2.5" /> {c}
                     </Badge>

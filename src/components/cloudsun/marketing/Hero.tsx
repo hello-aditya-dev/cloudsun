@@ -11,12 +11,12 @@ import { ArrowRight, Play, PhoneIncoming, CalendarCheck, MessageCircle, CheckCir
 import { motionDuration, motionEase } from "@/lib/motion/tokens";
 
 const flow = [
-  { kind: "call", title: "Incoming call", body: "Arjun Malhotra — portfolio review", icon: PhoneIncoming },
-  { kind: "transcript", title: "Live transcript", body: "“I'd like to set up a review with Amara.”", icon: Sparkles },
-  { kind: "calendar", title: "Checking calendar", body: "Thursday 11:00 — available", icon: CalendarCheck },
-  { kind: "booked", title: "Appointment created", body: "July 14 · 11:00–11:45 · Amara", icon: CheckCircle2 },
-  { kind: "whatsapp", title: "WhatsApp confirmation sent", body: "Simulated delivery to +91 99888 00112", icon: MessageCircle },
-  { kind: "inbox", title: "Conversation unified", body: "Appears in shared inbox with full history", icon: CheckCircle2 },
+  { kind: "call", title: "Incoming call", body: "New patient — tooth pain enquiry", icon: PhoneIncoming },
+  { kind: "transcript", title: "Emergency screening", body: "AI checks for swelling, bleeding, breathing difficulty", icon: Sparkles },
+  { kind: "calendar", title: "No red flags detected", body: "New-patient examination suggested", icon: CalendarCheck },
+  { kind: "booked", title: "Demonstration booking", body: "Tomorrow 10:00 AM · Lumen Dental Care — Central", icon: CheckCircle2 },
+  { kind: "whatsapp", title: "WhatsApp confirmation sent", body: "Simulated delivery · No medical diagnosis", icon: MessageCircle },
+  { kind: "inbox", title: "Conversation in practice inbox", body: "Appears in unified inbox with full patient history", icon: CheckCircle2 },
 ] as const;
 
 // Stagger config for hero entrance

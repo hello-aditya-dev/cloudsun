@@ -13,7 +13,7 @@ export default function OnboardingBusinessPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label className="text-xs">Business name</Label>
-              <Input defaultValue="Atelier North" className="mt-1" />
+              <Input defaultValue="Lumen Dental Care" className="mt-1" />
             </div>
             <div>
               <Label className="text-xs">Industry</Label>

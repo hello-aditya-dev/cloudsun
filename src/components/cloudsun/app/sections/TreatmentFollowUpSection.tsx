@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { useDemoState } from "@/hooks/use-demo-state";
 import { team } from "@/data/demo";
+import { demoTreatmentFollowUp } from "@/lib/repositories";
 import { timeAgo } from "../../shared/format";
 import { formatPrice } from "@/config/cloudsun";
 import { Search, ClipboardList, Send, Phone, AlertTriangle, CheckCircle2, DollarSign } from "lucide-react";

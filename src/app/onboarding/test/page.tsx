@@ -12,7 +12,7 @@ export default function OnboardingTestPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [thread, setThread] = useState<{ who: "user" | "ai"; text: string; confidence?: number }[]>([
-    { who: "ai", text: "Thank you for calling Atelier North, this is Sunny. How can I help you today?", confidence: 0.95 },
+    { who: "ai", text: "Thank you for calling Lumen Dental Care, this is Sunny. How can I help you today?", confidence: 0.95 },
   ]);
 
   function send() {

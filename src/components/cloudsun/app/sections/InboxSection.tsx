@@ -94,7 +94,7 @@ export function InboxSection() {
       conversationId: selectedConv.id,
       author: composerMode === "note" ? "human" : "human",
       channel: selectedConv.channel,
-      authorName: "Amara Iyer",
+      authorName: "Priya Sharma",
       body: composer,
       createdAt: now,
       kind: composerMode === "note" ? "note" : "message",
@@ -103,7 +103,7 @@ export function InboxSection() {
     demoConversations.appendMessage(selectedConv.id, msg);
     demoAudit.add({
       id: `al_${Date.now()}`,
-      actor: "Amara Iyer",
+      actor: "Priya Sharma",
       actorType: "human",
       action: composerMode === "note" ? "Added internal note" : "Sent reply",
       resource: `Conversation ${selectedConv.id}`,
@@ -174,7 +174,7 @@ export function InboxSection() {
     demoConversations.bulkUpdate(ids, patch);
     demoAudit.add({
       id: `al_${Date.now()}`,
-      actor: "Amara Iyer",
+      actor: "Priya Sharma",
       actorType: "human",
       action: `Bulk ${action} on ${ids.length} conversations`,
       resource: ids.join(", "),

@@ -247,3 +247,108 @@ export const demoKnowledge = new DemoKnowledgeRepository();
 export const demoAudit = new DemoAuditRepository();
 export const demoAIConfig = new DemoAIConfigRepository();
 export const demoWorkspace = new DemoWorkspaceRepositoryImpl();
+
+// ─── Recall, Waitlist, Treatment Follow-up repositories ──────────────────────
+
+import type { RecallCase, WaitlistEntry, TreatmentFollowUp } from "@/data/demo";
+
+export interface RecallRepository {
+  list(): RecallCase[];
+  getById(id: string): RecallCase | undefined;
+  update(id: string, patch: Partial<RecallCase>): void;
+  bulkUpdate(ids: string[], patch: Partial<RecallCase>): void;
+  sendReminder(id: string): void;
+  changeStatus(id: string, status: RecallCase["status"]): void;
+  assign(id: string, assigneeId: string): void;
+  close(id: string): void;
+}
+
+export interface WaitlistRepository {
+  list(): WaitlistEntry[];
+  update(id: string, patch: Partial<WaitlistEntry>): void;
+  invite(id: string): void;
+  accept(id: string): void;
+  decline(id: string): void;
+  fillSlot(id: string): void;
+}
+
+export interface TreatmentFollowUpRepository {
+  list(): TreatmentFollowUp[];
+  getById(id: string): TreatmentFollowUp | undefined;
+  update(id: string, patch: Partial<TreatmentFollowUp>): void;
+  sendFollowUp(id: string): void;
+  changeStage(id: string, stage: TreatmentFollowUp["stage"]): void;
+  assign(id: string, assigneeId: string): void;
+  close(id: string): void;
+}
+
+class DemoRecallRepository implements RecallRepository {
+  list() { return getDemoState().recallCases; }
+  getById(id: string) { return getDemoState().recallCases.find((r) => r.id === id); }
+  update(id: string, patch: Partial<RecallCase>) {
+    setDemoState((s) => ({
+      ...s,
+      recallCases: s.recallCases.map((r) => (r.id === id ? { ...r, ...patch } : r)),
+    }));
+  }
+  bulkUpdate(ids: string[], patch: Partial<RecallCase>) {
+    setDemoState((s) => ({
+      ...s,
+      recallCases: s.recallCases.map((r) => (ids.includes(r.id) ? { ...r, ...patch } : r)),
+    }));
+  }
+  sendReminder(id: string) {
+    this.update(id, { status: "contacted", lastContact: new Date().toISOString(), outcome: "Reminder sent (simulated)", nextAction: "Awaiting response" });
+    demoAudit.add({ id: `al_${Date.now()}`, actor: "CloudSun AI", actorType: "ai", action: "Sent recall reminder (simulated)", resource: `RecallCase ${id}`, at: new Date().toISOString(), ip: "ai-worker", result: "success", details: "Simulated outreach. No real patient contacted." });
+  }
+  changeStatus(id: string, status: RecallCase["status"]) { this.update(id, { status }); }
+  assign(id: string, assigneeId: string) { this.update(id, { assigneeId }); }
+  close(id: string) { this.update(id, { status: "do_not_contact", nextAction: "Closed" }); }
+}
+
+class DemoWaitlistRepository implements WaitlistRepository {
+  list() { return getDemoState().waitlist; }
+  update(id: string, patch: Partial<WaitlistEntry>) {
+    setDemoState((s) => ({
+      ...s,
+      waitlist: s.waitlist.map((w) => (w.id === id ? { ...w, ...patch } : w)),
+    }));
+  }
+  invite(id: string) {
+    this.update(id, { acceptanceState: "invited", lastOutreach: new Date().toISOString() });
+    demoAudit.add({ id: `al_${Date.now()}`, actor: "System", actorType: "system", action: "Waitlist invitation sent (simulated)", resource: `WaitlistEntry ${id}`, at: new Date().toISOString(), ip: "internal", result: "success", details: "Simulated invitation. No real patient contacted." });
+  }
+  accept(id: string) {
+    this.update(id, { acceptanceState: "accepted" });
+    demoAudit.add({ id: `al_${Date.now()}`, actor: "CloudSun AI", actorType: "ai", action: "Waitlist invitation accepted (simulated)", resource: `WaitlistEntry ${id}`, at: new Date().toISOString(), ip: "ai-worker", result: "success", details: "Slot filled in simulation." });
+  }
+  decline(id: string) {
+    this.update(id, { acceptanceState: "declined" });
+  }
+  fillSlot(id: string) {
+    this.update(id, { acceptanceState: "accepted" });
+    demoAudit.add({ id: `al_${Date.now()}`, actor: "CloudSun AI", actorType: "ai", action: "Cancellation slot filled from waitlist (simulated)", resource: `WaitlistEntry ${id}`, at: new Date().toISOString(), ip: "ai-worker", result: "success", details: "Appointment created in demo repository." });
+  }
+}
+
+class DemoTreatmentFollowUpRepository implements TreatmentFollowUpRepository {
+  list() { return getDemoState().treatmentFollowUps; }
+  getById(id: string) { return getDemoState().treatmentFollowUps.find((t) => t.id === id); }
+  update(id: string, patch: Partial<TreatmentFollowUp>) {
+    setDemoState((s) => ({
+      ...s,
+      treatmentFollowUps: s.treatmentFollowUps.map((t) => (t.id === id ? { ...t, ...patch } : t)),
+    }));
+  }
+  sendFollowUp(id: string) {
+    this.update(id, { stage: "first_message", lastContact: new Date().toISOString() });
+    demoAudit.add({ id: `al_${Date.now()}`, actor: "CloudSun AI", actorType: "ai", action: "Sent treatment follow-up (simulated)", resource: `TreatmentFollowUp ${id}`, at: new Date().toISOString(), ip: "ai-worker", result: "success", details: "Simulated outreach. No real patient contacted." });
+  }
+  changeStage(id: string, stage: TreatmentFollowUp["stage"]) { this.update(id, { stage }); }
+  assign(id: string, assigneeId: string) { this.update(id, { assigneeId }); }
+  close(id: string) { this.update(id, { stage: "closed", nextAction: "Closed" }); }
+}
+
+export const demoRecall = new DemoRecallRepository();
+export const demoWaitlist = new DemoWaitlistRepository();
+export const demoTreatmentFollowUp = new DemoTreatmentFollowUpRepository();

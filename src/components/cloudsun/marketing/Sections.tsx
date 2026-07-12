@@ -38,11 +38,11 @@ export function ChannelOverview() {
         <Reveal className="max-w-3xl">
           <SectionLabel>Channels</SectionLabel>
           <SectionHeading>
-            One front desk for every channel your clients already use.
+            One front desk for every channel your channels your patients already use.
           </SectionHeading>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground text-pretty">
             Phone, email, WhatsApp and website chat stop being four separate inboxes. CloudSun treats
-            every interaction as part of the same customer relationship — so a call on Monday and an
+            every interaction as part of the same patient relationship — so a call on Monday and an
             email on Friday show up in one continuous thread.
           </p>
         </Reveal>
@@ -72,13 +72,13 @@ export function ChannelOverview() {
   );
 }
 
-/* --------------------------- Unified customer timeline --------------------- */
+/* --------------------------- Unified patient timeline --------------------- */
 export function UnifiedTimeline() {
   return (
     <section id="product" className="border-t border-border/60 bg-muted/30 py-20 lg:py-28">
       <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 lg:grid-cols-2 lg:px-8">
         <div>
-          <SectionLabel>Unified customer timeline</SectionLabel>
+          <SectionLabel>Unified patient timeline</SectionLabel>
           <SectionHeading>
             A call becomes a WhatsApp, becomes an email — and your team sees it all.
           </SectionHeading>
@@ -110,8 +110,8 @@ export function UnifiedTimeline() {
                   MK
                 </div>
                 <div>
-                  <div className="text-sm font-medium">Meera Krishnan</div>
-                  <div className="text-[11px] text-muted-foreground">Krishnan Legal · VIP client</div>
+                  <div className="text-sm font-medium">Priya Sharma</div>
+                  <div className="text-[11px] text-muted-foreground">Lumen Dental Care · VIP patient</div>
                 </div>
               </div>
             </div>
@@ -214,9 +214,9 @@ export function PhoneExperience() {
             </div>
             <CardContent className="space-y-3 p-5">
               {[
-                { who: "ai", name: "Sunny", text: "Thank you for calling Atelier North, this is Sunny. How can I help?" },
-                { who: "caller", name: "Arjun", text: "Hi, I'd like to set up a portfolio review with Amara." },
-                { who: "ai", name: "Sunny", text: "Of course. Amara has Thursday at 11:00 or Friday at 15:00. Which works better?" },
+                { who: "ai", name: "Sunny", text: "Thank you for calling Lumen Dental Care, this is Sunny. How can I help?" },
+                { who: "caller", name: "Arjun", text: "Hi, I'd like to book a new-patient examination." },
+                { who: "ai", name: "Sunny", text: "Of course. Dr. Priya has Thursday at 11:00 or Friday at 15:00. Which works for you?" },
                 { who: "caller", name: "Arjun", text: "Thursday 11 works." },
                 { who: "ai", name: "Sunny", text: "Booked. I'll send a confirmation to your WhatsApp right away." },
               ].map((m, i) => (
@@ -362,7 +362,7 @@ export function Handoff() {
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {[
             { icon: Bot, title: "AI handles the routine", body: "Confirmations, FAQs, booking, rescheduling, triage — done in seconds, every time." },
-            { icon: AlertTriangle, title: "Flags what it can&apos;t", body: "Low confidence, negative sentiment, VIP clients, restricted topics — paused and passed on." },
+            { icon: AlertTriangle, title: "Flags what it can&apos;t", body: "Low confidence, negative sentiment, VIP patients, restricted topics — paused and passed on." },
             { icon: UserCheck, title: "Human takes over with context", body: "Full transcript, AI summary, suggested next action — no reliving the conversation." },
           ].map((c) => {
             const Icon = c.icon;
@@ -393,7 +393,7 @@ export function KnowledgeSection() {
           <div className="border-b border-border bg-muted/40 px-5 py-3 text-sm font-medium">Knowledge sources</div>
           <CardContent className="divide-y divide-border p-0">
             {[
-              { name: "Atelier North website", type: "Website", records: 142, status: "Synced" },
+              { name: "Lumen Dental Care website", type: "Website", records: 142, status: "Synced" },
               { name: "Services & pricing PDF", type: "PDF", records: 18, status: "Synced" },
               { name: "FAQ — common questions", type: "FAQ", records: 64, status: "Synced" },
               { name: "Notion — internal SOPs", type: "Notion", records: 88, status: "Syncing" },
@@ -461,7 +461,7 @@ export function AutomationSection() {
             "When a new WhatsApp lead arrives, qualify it and notify sales",
             "When a call is missed, send a WhatsApp follow-up",
             "When an appointment is booked, send email and WhatsApp confirmation",
-            "When customer sentiment turns negative, assign a manager",
+            "When patient sentiment turns negative, assign a manager",
             "When AI confidence is low, require human approval",
             "When no response is received for two days, create a follow-up",
           ].map((rule) => (
@@ -508,7 +508,7 @@ export function AnalyticsSection() {
               </div>
             ))}
           </div>
-          <p className="mt-4 text-[11px] text-muted-foreground">Demonstration data — not a real customer outcome.</p>
+          <p className="mt-4 text-[11px] text-muted-foreground">Demonstration data — not a real practice outcome.</p>
         </div>
 
         <Card className="overflow-hidden border-border bg-card p-6 shadow-lift">
@@ -753,16 +753,16 @@ export function Footer() {
             <p className="mt-3 text-sm text-muted-foreground">{product.description}</p>
           </div>
           {[
-            { title: "Product", links: ["Overview", "Channels", "AI Front Desk", "Pricing", "Security"] },
-            { title: "Channels", links: ["Phone", "Email", "WhatsApp", "Website chat"] },
-            { title: "Company", links: ["About", "Careers", "Contact", "Status"] },
+            { title: "Product", links: [{ label: "Overview", href: "/product" }, { label: "Demo", href: "/demo" }, { label: "Pricing", href: "/pricing" }, { label: "Security", href: "/security" }, { label: "Integrations", href: "/integrations" }] },
+            { title: "Solutions", links: [{ label: "New-patient intake", href: "/solutions/new-patient-intake" }, { label: "After-hours", href: "/solutions/after-hours" }, { label: "Cancellations", href: "/solutions/cancellations" }, { label: "Recall", href: "/solutions/recall" }, { label: "Treatment follow-up", href: "/solutions/treatment-follow-up" }] },
+            { title: "Legal", links: [{ label: "Privacy", href: "/privacy" }, { label: "Terms", href: "/terms" }, { label: "AI Disclosure", href: "/ai-disclosure" }, { label: "Contact", href: "/contact" }, { label: "Status", href: "/status" }] },
           ].map((col) => (
             <div key={col.title}>
               <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{col.title}</div>
               <ul className="mt-3 space-y-2">
                 {col.links.map((l) => (
-                  <li key={l}>
-                    <a href="#" className="text-sm text-foreground/70 hover:text-foreground">{l}</a>
+                  <li key={l.label}>
+                    <Link href={l.href} className="text-sm text-foreground/70 hover:text-foreground">{l.label}</Link>
                   </li>
                 ))}
               </ul>

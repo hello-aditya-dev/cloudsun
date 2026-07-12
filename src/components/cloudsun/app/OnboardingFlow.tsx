@@ -103,7 +103,7 @@ function BusinessStep() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <Label className="text-xs">Business name</Label>
-            <Input defaultValue="Atelier North" className="mt-1" />
+            <Input defaultValue="Lumen Dental Care" className="mt-1" />
           </div>
           <div>
             <Label className="text-xs">Industry</Label>
@@ -255,7 +255,7 @@ function AgentStep() {
         </div>
         <div>
           <Label className="text-xs">Greeting</Label>
-          <Textarea className="mt-1" defaultValue="Thank you for calling Atelier North, this is Sunny. How can I help you today?" />
+          <Textarea className="mt-1" defaultValue="Thank you for calling Lumen Dental Care, this is Sunny. How can I help you today?" />
         </div>
         <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 p-3">
           <div className="text-xs">
@@ -322,7 +322,7 @@ function TestStep() {
             <div className="flex justify-start">
               <div className="max-w-[80%] rounded-2xl rounded-tl-md bg-card px-3.5 py-2 text-sm shadow-soft">
                 <div className="mb-0.5 text-[10px] opacity-70">Sunny (AI)</div>
-                Thank you for calling Atelier North, this is Sunny. How can I help you today?
+                Thank you for calling Lumen Dental Care, this is Sunny. How can I help you today?
               </div>
             </div>
             <div className="flex justify-end">

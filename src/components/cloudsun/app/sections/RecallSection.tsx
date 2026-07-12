@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { useDemoState } from "@/hooks/use-demo-state";
 import { team } from "@/data/demo";
+import { demoRecall } from "@/lib/repositories";
 import { timeAgo } from "../../shared/format";
 import { Search, RotateCw, Send, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
 
@@ -52,6 +53,9 @@ export function RecallSection() {
   });
 
   function bulkAction(action: string) {
+    if (action === "send") {
+      selected.forEach((id) => demoRecall.sendReminder(id));
+    }
     // Simulated — would update recall cases via repository
     setSelected(new Set());
   }
