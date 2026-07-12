@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { m, AnimatePresence, useReducedMotion } from "motion/react";
 import { channels, type ChannelId } from "@/config/cloudsun";
@@ -10,6 +10,18 @@ import {
   type DentalAIResponse,
   type IntentDetection,
 } from "@/lib/demo-ai";
+import {
+  demoConversations,
+  demoContacts,
+  demoAudit,
+} from "@/lib/repositories";
+import { setDemoState, getDemoState } from "@/lib/demo-store";
+import { locations } from "@/data/demo";
+import type {
+  Contact,
+  Conversation,
+  Message,
+} from "@/types/domain";
 import { MarketingHeader } from "./MarketingHeader";
 import { Footer } from "./Sections";
 import { Reveal, RevealGroup, RevealItem } from "../motion/Reveal";
@@ -38,6 +50,7 @@ import {
   BookOpen,
   HelpCircle,
   ListChecks,
+  ExternalLink,
 } from "lucide-react";
 import { motionDuration, motionEase } from "@/lib/motion/tokens";
 
@@ -164,6 +177,32 @@ const scenarios: Scenario[] = [
   },
 ];
 
+// Emergency scenario for red-flag demonstration
+const emergencyScenarios: Scenario[] = [
+  {
+    id: "emergency-swelling",
+    title: "Emergency — severe swelling",
+    blurb: "Patient reports severe facial swelling after extraction.",
+    patientName: "Raj Malhotra",
+    message:
+      "I had a tooth extracted yesterday and now I have severe facial swelling and difficulty breathing. Please help!",
+    icon: AlertTriangle,
+    accent: "ember",
+  },
+  {
+    id: "clinical-question",
+    title: "Clinical question",
+    blurb: "Patient asks whether their symptoms indicate an infection.",
+    patientName: "Amara Obi",
+    message:
+      "Could this be an infection? My gum is swollen and there's a bad taste. Should I be worried about an abscess?",
+    icon: HelpCircle,
+    accent: "amber",
+  },
+];
+
+const allScenarios = [...scenarios, ...emergencyScenarios];
+
 const channelOptions: { id: ChannelOption; icon: typeof Phone }[] = [
   { id: "phone", icon: Phone },
   { id: "whatsapp", icon: MessageCircle },
@@ -181,6 +220,22 @@ const patientOptions: { id: PatientOption; label: string; icon: typeof User }[] 
   { id: "new", label: "New patient", icon: UserPlus },
   { id: "existing", label: "Existing patient", icon: User },
 ];
+
+/** Map location option to the demo-data location ID. */
+function locationIdFor(loc: LocationOption): string {
+  const map: Record<LocationOption, string> = {
+    central: "loc_central",
+    north: "loc_north",
+    riverside: "loc_riverside",
+  };
+  return map[loc];
+}
+
+/** Map location option to a human-readable name. */
+function locationNameFor(loc: LocationOption): string {
+  const found = locations.find((l) => l.id === locationIdFor(loc));
+  return found?.name ?? loc;
+}
 
 function intentLabel(intent: string): string {
   const map: Record<string, string> = {
@@ -310,25 +365,347 @@ function ResultRow({
   );
 }
 
+// ─── Persistent scenario execution ──────────────────────────────────────────
+
+/**
+ * Build a deterministic conversation ID from the scenario + location + channel.
+ * Running the same scenario twice produces the same ID, so the conversation
+ * is updated rather than duplicated.
+ */
+function buildConversationId(
+  scenarioId: string,
+  location: LocationOption,
+  channel: ChannelOption,
+): string {
+  return `demo_dental_${scenarioId}_${location}_${channel}`;
+}
+
+/**
+ * Build a deterministic contact ID for the fictional demo patient.
+ */
+function buildContactId(scenarioId: string): string {
+  return `demo_contact_${scenarioId}`;
+}
+
+/**
+ * Derive a colour from the patient name for the avatar.
+ * Uses a simple hash → oklch hue rotation.
+ */
+function avatarColorFor(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  const hue = ((hash % 360) + 360) % 360;
+  return `oklch(0.60 0.14 ${hue})`;
+}
+
+/**
+ * Create or update a fictional Contact (patient) in the repository and return its ID.
+ */
+function ensureDemoContact(
+  scenario: Scenario,
+  patientType: PatientOption,
+  location: LocationOption,
+  channel: ChannelOption,
+): string {
+  const contactId = buildContactId(scenario.id);
+  const existing = demoContacts.getById(contactId);
+
+  const locationLabel = locationOptions.find((l) => l.id === location)?.label ?? "Central";
+  const initials = scenario.patientName
+    .split(" ")
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2);
+
+  const contact: Contact = {
+    id: contactId,
+    name: scenario.patientName,
+    company: undefined,
+    identities: [
+      { channel: "phone", handle: `+1 555-${scenario.id.slice(0, 3)}-0000`, verified: true },
+      { channel: "email", handle: `${scenario.patientName.toLowerCase().replace(/[^a-z]/g, "")}@demo.example`, verified: patientType === "existing" },
+    ],
+    primaryChannel: channel,
+    lastInteraction: new Date().toISOString(),
+    leadStage: patientType === "new" ? "new" : "customer",
+    ownerId: undefined,
+    upcomingAppointmentId: undefined,
+    sentiment: "neutral",
+    tags: ["demo-scenario", scenario.id],
+    notes: `Demo patient created by scenario "${scenario.title}".`,
+    aiSummary: "",
+    consent: { recorded: true, marketing: patientType === "existing" },
+    avatarColor: existing?.avatarColor ?? avatarColorFor(scenario.patientName),
+    initials,
+    // Dental-specific fields
+    patientStatus: patientType === "new" ? "new_lead" : "existing_patient",
+    preferredName: scenario.patientName.split(" ")[0],
+    preferredLocation: locationLabel,
+    preferredDentist: "Any dentist",
+    lastVisitAt: patientType === "existing" ? new Date(Date.now() - 45 * 86400000).toISOString() : undefined,
+    nextAppointmentId: undefined,
+    recallDueAt: undefined,
+    recallStatus: "not_due",
+    waitlistStatus: "not_on_waitlist",
+    treatmentFollowUpStatus: "none",
+    insuranceProvider: undefined,
+    paymentType: "self_pay",
+    dateOfBirthMasked: "XX/XX/XXXX",
+    isMinor: false,
+  };
+
+  if (existing) {
+    // Update the existing contact (merge in new fields)
+    demoContacts.update(contactId, {
+      lastInteraction: contact.lastInteraction,
+      leadStage: contact.leadStage,
+      primaryChannel: contact.primaryChannel,
+      patientStatus: contact.patientStatus,
+      preferredLocation: contact.preferredLocation,
+      tags: contact.tags,
+    });
+  } else {
+    // Insert by direct state mutation (no "add" method on ContactRepository)
+    setDemoState((s) => ({
+      ...s,
+      contacts: [...s.contacts, contact],
+    }));
+  }
+
+  return contactId;
+}
+
+/**
+ * Create or update a Conversation record with a deterministic ID and return the ID.
+ */
+function ensureDemoConversation(
+  conversationId: string,
+  contactId: string,
+  scenario: Scenario,
+  channel: ChannelOption,
+  location: LocationOption,
+  intentDetection: IntentDetection,
+  aiResponse: DentalAIResponse,
+): string {
+  const existing = demoConversations.getById(conversationId);
+  const now = new Date().toISOString();
+
+  const priority: Conversation["priority"] = aiResponse.isEmergency
+    ? "urgent"
+    : aiResponse.handoff
+      ? "high"
+      : "normal";
+
+  const status: Conversation["status"] = aiResponse.handoff
+    ? aiResponse.isEmergency
+      ? "waiting"
+      : "needs_approval"
+    : "ai_handling";
+
+  const sentiment: Conversation["sentiment"] = aiResponse.isEmergency
+    ? "negative"
+    : aiResponse.intent === "angry_patient"
+      ? "negative"
+      : "neutral";
+
+  const tags = [
+    "demo-scenario",
+    scenario.id,
+    intentDetection.intent,
+    ...(aiResponse.isEmergency ? ["emergency"] : []),
+    ...(aiResponse.handoff ? ["handoff"] : []),
+    ...(aiResponse.suggestedAppointmentType ? ["appointment-suggested"] : []),
+  ];
+
+  if (existing) {
+    // Update existing conversation — keep it fresh but don't duplicate
+    demoConversations.update(conversationId, {
+      contactName: scenario.patientName,
+      channel,
+      subject: `${scenario.title} — ${locationOptions.find((l) => l.id === location)?.label ?? "Central"}`,
+      preview: scenario.message,
+      lastAt: now,
+      unread: 1,
+      status,
+      priority,
+      aiHandling: !aiResponse.handoff,
+      tags,
+      sentiment,
+      aiConfidence: aiResponse.confidence,
+    });
+  } else {
+    // Create the conversation via direct state mutation
+    const conv: Conversation = {
+      id: conversationId,
+      contactId,
+      contactName: scenario.patientName,
+      channel,
+      subject: `${scenario.title} — ${locationOptions.find((l) => l.id === location)?.label ?? "Central"}`,
+      preview: scenario.message,
+      lastAt: now,
+      unread: 1,
+      status,
+      priority,
+      assigneeId: aiResponse.handoff ? "u_anita" : undefined,
+      aiHandling: !aiResponse.handoff,
+      slaMinutes: aiResponse.isEmergency ? 5 : 30,
+      slaBreached: false,
+      tags,
+      hasAppointment: !!aiResponse.suggestedAppointmentType,
+      hasLead: true,
+      sentiment,
+      aiConfidence: aiResponse.confidence,
+    };
+    setDemoState((s) => ({
+      ...s,
+      conversations: [conv, ...s.conversations],
+    }));
+  }
+
+  return conversationId;
+}
+
+/**
+ * Persist the three messages (patient, AI, system decision) into the conversation.
+ * If the conversation already has messages from a prior run, replace them so
+ * re-running the same scenario doesn't produce duplicates.
+ */
+function persistMessages(
+  conversationId: string,
+  scenario: Scenario,
+  channel: ChannelOption,
+  intentDetection: IntentDetection,
+  aiResponse: DentalAIResponse,
+): void {
+  const now = new Date();
+  const ts = now.toISOString();
+
+  // Clear any existing messages for this conversation (deterministic — re-running replaces)
+  setDemoState((s) => ({
+    ...s,
+    messages: { ...s.messages, [conversationId]: [] },
+  }));
+
+  // 1. Patient message
+  const patientMsg: Message = {
+    id: `msg_patient_${conversationId}`,
+    conversationId,
+    author: "customer",
+    channel,
+    authorName: scenario.patientName,
+    body: scenario.message,
+    createdAt: ts,
+    status: "read",
+    kind: "message",
+  };
+
+  // 2. Simulated AI response
+  const aiMsg: Message = {
+    id: `msg_ai_${conversationId}`,
+    conversationId,
+    author: "ai",
+    channel,
+    authorName: "CloudSun AI (simulated)",
+    body: aiResponse.text,
+    createdAt: new Date(now.getTime() + 1500).toISOString(),
+    aiConfidence: aiResponse.confidence,
+    status: "read",
+    kind: "message",
+  };
+
+  // 3. System decision event
+  const decisionBody = JSON.stringify(
+    {
+      detectedIntent: intentDetection.intent,
+      confidence: intentDetection.confidence,
+      isEmergency: intentDetection.isEmergency,
+      requiresHandoff: intentDetection.requiresHandoff,
+      matchedKeywords: intentDetection.matchedKeywords,
+      suggestedAppointmentType: aiResponse.suggestedAppointmentType ?? null,
+      toolCall: aiResponse.toolCall ?? null,
+      approvalRequired: aiResponse.approvalRequired,
+      handoffDecision: aiResponse.handoff
+        ? aiResponse.isEmergency
+          ? "Immediate escalation — on-call team notified"
+          : "Transfers to a human team member"
+        : "Handled by the AI front desk",
+      humanHandoffReason: aiResponse.handoff
+        ? aiResponse.isEmergency
+          ? "Emergency red flag detected"
+          : aiResponse.intent === "clinical_question"
+            ? "Clinical question requires dentist assessment"
+            : aiResponse.intent === "angry_patient"
+              ? "Negative sentiment — manager escalation"
+              : "Patient requested human assistance"
+        : null,
+    },
+    null,
+    2,
+  );
+
+  const decisionMsg: Message = {
+    id: `msg_decision_${conversationId}`,
+    conversationId,
+    author: "system",
+    channel,
+    authorName: "CloudSun AI Decision Engine",
+    body: decisionBody,
+    createdAt: new Date(now.getTime() + 2000).toISOString(),
+    kind: "event",
+  };
+
+  // Append all three messages using the repository
+  demoConversations.appendMessage(conversationId, patientMsg);
+  demoConversations.appendMessage(conversationId, aiMsg);
+  demoConversations.appendMessage(conversationId, decisionMsg);
+}
+
+/**
+ * Record an audit entry for the scenario execution.
+ */
+function recordAudit(
+  scenario: Scenario,
+  conversationId: string,
+  channel: ChannelOption,
+  location: LocationOption,
+  aiResponse: DentalAIResponse,
+): void {
+  demoAudit.add({
+    id: `al_demo_${scenario.id}_${Date.now()}`,
+    actor: "CloudSun AI",
+    actorType: "ai",
+    action: `Demo scenario executed: ${scenario.title}`,
+    resource: `Conversation ${conversationId}`,
+    at: new Date().toISOString(),
+    ip: "demo-page",
+    result: "success",
+    details: `Channel: ${channel}, Location: ${location}, Intent: ${aiResponse.intent}, Confidence: ${Math.round(aiResponse.confidence * 100)}%, Emergency: ${aiResponse.isEmergency}, Handoff: ${aiResponse.handoff}`,
+  });
+}
+
+// ─── Component ──────────────────────────────────────────────────────────────
+
 export function DentalDemoPage() {
-  const [scenarioId, setScenarioId] = useState<string>(scenarios[0].id);
+  const [scenarioId, setScenarioId] = useState<string>(allScenarios[0].id);
   const [channel, setChannel] = useState<ChannelOption>("phone");
   const [location, setLocation] = useState<LocationOption>("central");
   const [patientType, setPatientType] = useState<PatientOption>("new");
 
   const [result, setResult] = useState<DentalAIResponse | null>(null);
   const [detection, setDetection] = useState<IntentDetection | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const reduced = useReducedMotion();
 
   const scenario = useMemo(
-    () => scenarios.find((s) => s.id === scenarioId)!,
+    () => allScenarios.find((s) => s.id === scenarioId)!,
     [scenarioId],
   );
 
-  const runSimulation = () => {
+  /** Execute the scenario: create persisted contact + conversation + messages + audit. */
+  const runSimulation = useCallback(() => {
     setRunning(true);
-    // Deterministic engine — simulate a small delay so the UI feels responsive
+    // Small delay for visual feedback
     setTimeout(() => {
       const det = detectIntent(scenario.message);
       const resp = generateDentalAIResponse(
@@ -336,17 +713,36 @@ export function DentalDemoPage() {
         channel,
         scenario.patientName,
       );
+
+      // 1. Create or update the fictional patient contact
+      const contactId = ensureDemoContact(scenario, patientType, location, channel);
+
+      // 2. Build the deterministic conversation ID
+      const convId = buildConversationId(scenario.id, location, channel);
+
+      // 3. Create or update the conversation record
+      ensureDemoConversation(convId, contactId, scenario, channel, location, det, resp);
+
+      // 4. Persist the patient message, AI response, and system decision event
+      persistMessages(convId, scenario, channel, det, resp);
+
+      // 5. Record the audit entry
+      recordAudit(scenario, convId, channel, location, resp);
+
+      // 6. Update component state for the inline result display
       setDetection(det);
       setResult(resp);
+      setConversationId(convId);
       setRunning(false);
     }, 280);
-  };
+  }, [scenario, channel, location, patientType]);
 
   // Reset results when scenario changes
   const handleScenarioChange = (id: string) => {
     setScenarioId(id);
     setResult(null);
     setDetection(null);
+    setConversationId(null);
   };
 
   const locationLabel =
@@ -378,8 +774,11 @@ export function DentalDemoPage() {
       (result.suggestedAppointmentType
         ? ` Suggested appointment type: ${result.suggestedAppointmentType}.`
         : "") +
-      ` All actions simulated.`
+      ` All actions simulated. Conversation persisted with ID ${conversationId}.`
     : "";
+
+  // The inbox URL that links directly to the persisted conversation
+  const inboxUrl = conversationId ? `/app/inbox/${conversationId}` : "/app/inbox";
 
   return (
     <div className="min-h-screen bg-background">
@@ -388,15 +787,15 @@ export function DentalDemoPage() {
         {/* Hero */}
         <section className="relative overflow-hidden bg-paper py-16 lg:py-24">
           <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-[oklch(0.62_0.16_42)] opacity-[0.06] blur-3xl" />
-          <div className="pointer-events-none absolute -right-24 top-32 h-72 w-72 rounded-full bg-[oklch(0.45_0.08_155)] opacity-[0.05] blur-3xl" />
-          <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
             <Reveal className="max-w-3xl">
-              <SectionLabel>Demo</SectionLabel>
-              <h1 className="mt-4 font-serif text-4xl leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] text-balance">
-                Try the dental front desk on{" "}
-                <span className="text-[oklch(0.62_0.16_42)]">ten real scenarios.</span>
+              <SectionLabel>Interactive demo</SectionLabel>
+              <h1 className="mt-4 font-serif text-4xl leading-tight text-foreground sm:text-5xl lg:text-6xl">
+                See the dental AI
+                <br />
+                front desk in action
               </h1>
-              <p className="mt-6 text-lg leading-relaxed text-muted-foreground text-pretty">
+              <p className="mt-5 max-w-xl text-lg leading-relaxed text-foreground/70">
                 Pick a scenario, channel, location and patient type, then run the simulation. You&apos;ll
                 see what the AI detected, what knowledge it used, what it asked, what it was permitted
                 to do, and whether a human needed to step in.
@@ -404,6 +803,10 @@ export function DentalDemoPage() {
               <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-[oklch(0.62_0.16_42)]/30 bg-[oklch(0.62_0.16_42)]/[0.05] px-3 py-1.5 text-xs text-[oklch(0.62_0.16_42)]">
                 <Bot className="h-3.5 w-3.5" />
                 Simulated dental front-desk response
+              </div>
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[oklch(0.45_0.08_155)]/30 bg-[oklch(0.45_0.08_155)]/[0.05] px-3 py-1.5 text-xs text-[oklch(0.45_0.08_155)]">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                Conversations persist to the inbox — click &ldquo;Open in Inbox&rdquo; to view
               </div>
             </Reveal>
           </div>
@@ -420,7 +823,7 @@ export function DentalDemoPage() {
             </Reveal>
 
             <RevealGroup className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" stagger={0.05}>
-              {scenarios.map((s) => {
+              {allScenarios.map((s) => {
                 const Icon = s.icon;
                 const active = s.id === scenarioId;
                 const accentColor =
@@ -536,6 +939,19 @@ export function DentalDemoPage() {
                         />
                       </div>
                     </div>
+
+                    {/* Deterministic ID preview */}
+                    <div className="mt-6 rounded-lg border border-dashed border-border bg-muted/20 p-3">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Conversation ID (deterministic)
+                      </div>
+                      <code className="mt-1 block text-xs text-foreground/70 break-all">
+                        {buildConversationId(scenario.id, location, channel)}
+                      </code>
+                      <p className="mt-1 text-[10px] text-muted-foreground">
+                        Re-running the same scenario + location + channel updates the same conversation instead of creating a duplicate.
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               </Reveal>
@@ -601,7 +1017,7 @@ export function DentalDemoPage() {
                         </Button>
                       </m.div>
                       <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                        Simulated dental front-desk response · no real call placed
+                        Creates a real persisted conversation in the demo inbox
                       </p>
                     </div>
                   </CardContent>
@@ -633,7 +1049,8 @@ export function DentalDemoPage() {
                       </div>
                       <p className="max-w-md text-sm text-muted-foreground">
                         You&apos;ll see detected intent, confidence, knowledge used, questions asked,
-                        suggested appointment, tool permission and handoff decision.
+                        suggested appointment, tool permission and handoff decision. The conversation
+                        is persisted so you can open it in the practice dashboard.
                       </p>
                     </CardContent>
                   </Card>
@@ -658,13 +1075,22 @@ export function DentalDemoPage() {
                           {patientType === "new" ? "New patient" : "Existing patient"}
                         </p>
                       </div>
-                      <Badge
-                        variant="outline"
-                        className="border-[oklch(0.62_0.16_42)]/30 text-[11px] text-[oklch(0.62_0.16_42)]"
-                      >
-                        <Bot className="mr-1 h-3 w-3" />
-                        Simulated dental front-desk response
-                      </Badge>
+                      <div className="flex items-center gap-3">
+                        <Badge
+                          variant="outline"
+                          className="border-[oklch(0.45_0.08_155)]/30 text-[11px] text-[oklch(0.45_0.08_155)]"
+                        >
+                          <CheckCircle2 className="mr-1 h-3 w-3" />
+                          Persisted to inbox
+                        </Badge>
+                        <Badge
+                          variant="outline"
+                          className="border-[oklch(0.62_0.16_42)]/30 text-[11px] text-[oklch(0.62_0.16_42)]"
+                        >
+                          <Bot className="mr-1 h-3 w-3" />
+                          Simulated
+                        </Badge>
+                      </div>
                     </div>
                   </Reveal>
 
@@ -673,9 +1099,12 @@ export function DentalDemoPage() {
                     <Card className="overflow-hidden border-border bg-card shadow-lift">
                       <div className="border-b border-border bg-muted/40 px-5 py-3">
                         <div className="flex items-center justify-between">
-                          <div className="text-xs font-medium text-foreground">Conversation</div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-xs font-medium text-foreground">Conversation</div>
+                            <code className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{conversationId}</code>
+                          </div>
                           <div className="text-[11px] text-muted-foreground">
-                            {channels[channel].label} · simulated
+                            {channels[channel].label} · {locationLabel} · persisted
                           </div>
                         </div>
                       </div>
@@ -717,6 +1146,54 @@ export function DentalDemoPage() {
                                 Emergency escalation triggered
                               </div>
                             )}
+                          </div>
+                        </div>
+
+                        {/* System decision event (compact) */}
+                        <div className="flex gap-3">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                            <ShieldQuestion className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-[11px] text-muted-foreground">
+                              CloudSun AI Decision Engine · system event
+                            </div>
+                            <div className="mt-1 rounded-xl rounded-tl-sm border border-dashed border-border bg-muted/20 px-3 py-2">
+                              <div className="grid gap-x-4 gap-y-1 text-xs sm:grid-cols-2">
+                                <div>
+                                  <span className="text-muted-foreground">Intent:</span>{" "}
+                                  <span className="text-foreground">{intentLabel(detection?.intent ?? result.intent)}</span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Confidence:</span>{" "}
+                                  <span className="text-foreground">{Math.round((detection?.confidence ?? result.confidence) * 100)}%</span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Emergency:</span>{" "}
+                                  <span className={result.isEmergency ? "text-[oklch(0.62_0.16_42)] font-medium" : "text-foreground"}>
+                                    {result.isEmergency ? "Yes — red flag" : "No"}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Handoff:</span>{" "}
+                                  <span className={result.handoff ? "text-[oklch(0.62_0.16_42)] font-medium" : "text-foreground"}>
+                                    {result.handoff ? "Yes" : "No"}
+                                  </span>
+                                </div>
+                                {result.suggestedAppointmentType && (
+                                  <div>
+                                    <span className="text-muted-foreground">Appt type:</span>{" "}
+                                    <span className="text-foreground">{result.suggestedAppointmentType}</span>
+                                  </div>
+                                )}
+                                {result.toolCall && (
+                                  <div>
+                                    <span className="text-muted-foreground">Tool:</span>{" "}
+                                    <span className="text-foreground">{result.toolCall}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </CardContent>
@@ -856,22 +1333,32 @@ export function DentalDemoPage() {
                     </Card>
                   </Reveal>
 
-                  {/* CTA */}
+                  {/* CTA — links directly to the persisted conversation in the inbox */}
                   <Reveal className="mt-8">
-                    <Card className="border-[oklch(0.62_0.16_42)]/30 bg-[oklch(0.62_0.16_42)]/[0.04]">
+                    <Card className="border-[oklch(0.45_0.08_155)]/30 bg-[oklch(0.45_0.08_155)]/[0.04]">
                       <CardContent className="flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <div className="font-serif text-lg text-foreground">
-                            See this conversation in the practice dashboard
+                            Open this conversation in the practice dashboard
                           </div>
                           <p className="mt-1 text-sm text-muted-foreground">
                             The unified inbox shows the full transcript, AI decisions, and the
-                            human handoff — exactly as your team would see it.
+                            human handoff — exactly as your team would see it. This conversation
+                            is persisted and survives page refresh.
                           </p>
+                          <div className="mt-2 flex items-center gap-2">
+                            <code className="rounded bg-muted/60 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                              {conversationId}
+                            </code>
+                            <span className="text-[10px] text-muted-foreground">
+                              Deterministic — re-running updates the same conversation
+                            </span>
+                          </div>
                         </div>
-                        <Link href="/app/inbox" className="shrink-0">
-                          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            View in practice dashboard
+                        <Link href={inboxUrl} className="shrink-0">
+                          <Button className="bg-[oklch(0.45_0.08_155)] text-white hover:bg-[oklch(0.45_0.08_155)]/90">
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            Open in Inbox
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </Button>
                         </Link>
