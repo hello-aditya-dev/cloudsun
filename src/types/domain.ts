@@ -56,6 +56,44 @@ export interface ContactIdentity {
   verified: boolean;
 }
 
+export type PatientStatus =
+  | "new_lead"
+  | "new_patient"
+  | "existing_patient"
+  | "inactive"
+  | "archived";
+
+export type RecallStatus =
+  | "not_due"
+  | "due_soon"
+  | "due_now"
+  | "overdue"
+  | "contacted"
+  | "responded"
+  | "booked"
+  | "declined"
+  | "do_not_contact";
+
+export type WaitlistStatus =
+  | "not_on_waitlist"
+  | "waiting"
+  | "invited"
+  | "accepted"
+  | "declined"
+  | "filled";
+
+export type TreatmentFollowUpStatus =
+  | "none"
+  | "follow_up_due"
+  | "first_message"
+  | "patient_responded"
+  | "question_pending"
+  | "coordinator_required"
+  | "appointment_booked"
+  | "not_ready"
+  | "declined"
+  | "closed";
+
 export interface Contact {
   id: ID;
   name: string;
@@ -73,6 +111,21 @@ export interface Contact {
   consent: { recorded: boolean; marketing: boolean };
   avatarColor: string;
   initials: string;
+  // Dental-specific typed fields
+  patientStatus: PatientStatus;
+  preferredName?: string;
+  preferredLocation?: string;
+  preferredDentist?: string;
+  lastVisitAt?: ISODate;
+  nextAppointmentId?: ID;
+  recallDueAt?: ISODate;
+  recallStatus: RecallStatus;
+  waitlistStatus: WaitlistStatus;
+  treatmentFollowUpStatus: TreatmentFollowUpStatus;
+  insuranceProvider?: string;
+  paymentType?: "self_pay" | "insured" | "financing";
+  dateOfBirthMasked?: string;
+  isMinor?: boolean;
 }
 
 export type MessageAuthor = "customer" | "ai" | "human" | "system";
@@ -160,11 +213,15 @@ export interface Call {
 }
 
 export type AppointmentStatus =
-  | "scheduled"
+  | "requested"
+  | "tentative"
   | "confirmed"
+  | "checked_in"
   | "completed"
   | "cancelled"
-  | "no_show";
+  | "no_show"
+  | "waitlist_fill"
+  | "approval_required";
 
 export interface Appointment {
   id: ID;
@@ -181,6 +238,16 @@ export interface Appointment {
   type: string;
   location?: string;
   notes?: string;
+  // Dental-specific fields
+  providerId?: ID;
+  locationId?: string;
+  appointmentTypeId?: string;
+  bookingSource?: string;
+  bookingMode?: "ai" | "human" | "online";
+  confirmationStatus?: "pending" | "confirmed" | "declined";
+  createdFromWaitlistEntryId?: ID;
+  createdFromCancellationSlotId?: ID;
+  internalNote?: string;
 }
 
 export type KnowledgeSourceStatus =

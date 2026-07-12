@@ -113,7 +113,7 @@ function BusinessStep() {
                 <SelectItem value="professional">Professional services</SelectItem>
                 <SelectItem value="health">Health & wellness</SelectItem>
                 <SelectItem value="clinic">Clinic / dental</SelectItem>
-                <SelectItem value="salon">Salon & spa</SelectItem>
+                <SelectItem value="orthodontic">Orthodontic practice</SelectItem>
                 <SelectItem value="legal">Legal</SelectItem>
                 <SelectItem value="finance">Finance & tax</SelectItem>
                 <SelectItem value="other">Other</SelectItem>

@@ -289,7 +289,7 @@ export function InboxSection() {
                 </Avatar>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <Link href={`/app/contacts/${selectedConv.contactId}`} className="truncate text-sm font-medium hover:underline">
+                    <Link href={`/app/patients/${selectedConv.contactId}`} className="truncate text-sm font-medium hover:underline">
                       {selectedConv.contactName}
                     </Link>
                     <ChannelBadge id={selectedConv.channel} withLabel />
@@ -503,7 +503,7 @@ function ContextPanel({ contactId }: { contactId: string }) {
             {contact.initials}
           </AvatarFallback>
         </Avatar>
-        <Link href={`/app/contacts/${contact.id}`} className="mt-3 font-serif text-lg hover:underline">{contact.name}</Link>
+        <Link href={`/app/patients/${contact.id}`} className="mt-3 font-serif text-lg hover:underline">{contact.name}</Link>
         {contact.company && <div className="text-xs text-muted-foreground">{contact.company.name}</div>}
         <div className="mt-2 flex flex-wrap justify-center gap-1">
           <Badge variant="outline" className="text-[10px] capitalize">{contact.leadStage}</Badge>
@@ -539,7 +539,7 @@ function ContextPanel({ contactId }: { contactId: string }) {
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Quick actions</div>
           <div className="grid grid-cols-2 gap-1.5">
             <Link href="/app/calendar"><Button variant="outline" size="sm" className="h-7 text-[11px]"><Calendar className="h-3 w-3" /> Book</Button></Link>
-            <Link href={`/app/contacts/${contact.id}`}><Button variant="outline" size="sm" className="h-7 text-[11px]"><FileText className="h-3 w-3" /> Profile</Button></Link>
+            <Link href={`/app/patients/${contact.id}`}><Button variant="outline" size="sm" className="h-7 text-[11px]"><FileText className="h-3 w-3" /> Profile</Button></Link>
           </div>
         </div>
       </div>

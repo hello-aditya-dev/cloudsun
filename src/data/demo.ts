@@ -155,6 +155,30 @@ function makePatient(
   sentiment: Contact["sentiment"] = "neutral", initials: string,
   avatarColor: string,
 ): Contact {
+  // Derive typed dental fields from parameters
+  const patientStatus: Contact["patientStatus"] =
+    patientType === "new" ? (leadStage === "new" ? "new_lead" : "new_patient") : "existing_patient";
+
+  const recallStatus: Contact["recallStatus"] = recallDue
+    ? new Date(recallDue) < now
+      ? tags.includes("recall-overdue")
+        ? "overdue"
+        : "due_now"
+      : "due_soon"
+    : "not_due";
+
+  const waitlistStatus: Contact["waitlistStatus"] = tags.includes("waitlist")
+    ? "waiting"
+    : "not_on_waitlist";
+
+  const treatmentFollowUpStatus: Contact["treatmentFollowUpStatus"] = tags.includes("treatment-follow-up")
+    ? "follow_up_due"
+    : "none";
+
+  const paymentType: Contact["paymentType"] = insurance.startsWith("Self-pay")
+    ? "self_pay"
+    : "insured";
+
   return {
     id,
     name,
@@ -175,6 +199,21 @@ function makePatient(
     consent: { recorded: true, marketing: patientType === "existing" },
     avatarColor,
     initials,
+    // Typed dental fields
+    patientStatus,
+    preferredName: name.split(" ")[0],
+    preferredLocation,
+    preferredDentist,
+    lastVisitAt: lastVisit ?? undefined,
+    nextAppointmentId: nextAppt ?? undefined,
+    recallDueAt: recallDue ?? undefined,
+    recallStatus,
+    waitlistStatus,
+    treatmentFollowUpStatus,
+    insuranceProvider: insurance.startsWith("Self-pay") ? undefined : insurance.replace("Insured — ", ""),
+    paymentType,
+    dateOfBirthMasked: "XX/XX/XXXX",
+    isMinor: false,
   };
 }
 
@@ -370,13 +409,13 @@ const at = (dayOffset: number, h: number, m = 0) => {
 
 export const appointments: Appointment[] = [
   { id: "ap_1", contactId: "p_1", contactName: "Aarav Patel", title: "Whitening consultation", startAt: at(2, 11, 0), endAt: at(2, 12, 30), status: "confirmed", source: "phone", assigneeId: "u_dr_chen", channel: "phone", timezone: "Asia/Calcutta", type: "Whitening", location: "Lumen Dental Care — Central" },
-  { id: "ap_2", contactId: "p_5", contactName: "Kabir Singh", title: "New-patient examination", startAt: at(1, 14, 0), endAt: at(1, 14, 45), status: "scheduled", source: "phone", assigneeId: "u_priya", channel: "phone", timezone: "Asia/Calcutta", type: "New-patient exam", location: "Lumen Dental Care — Central", notes: "Tooth pain. Non-emergency." },
+  { id: "ap_2", contactId: "p_5", contactName: "Kabir Singh", title: "New-patient examination", startAt: at(1, 14, 0), endAt: at(1, 14, 45), status: "requested", source: "phone", assigneeId: "u_priya", channel: "phone", timezone: "Asia/Calcutta", type: "New-patient exam", location: "Lumen Dental Care — Central", notes: "Tooth pain. Non-emergency." },
   { id: "ap_3", contactId: "p_2", contactName: "Diya Krishnan", title: "Invisalign consultation", startAt: at(3, 15, 0), endAt: at(3, 16, 0), status: "confirmed", source: "phone", assigneeId: "u_dr_chen", channel: "phone", timezone: "Asia/Calcutta", type: "Invisalign consultation", location: "Lumen Dental Care — North" },
   { id: "ap_4", contactId: "p_3", contactName: "Rohan Gupta", title: "Hygiene cleaning", startAt: at(5, 9, 30), endAt: at(5, 10, 30), status: "confirmed", source: "whatsapp", assigneeId: "u_hyg_sara", channel: "whatsapp", timezone: "Asia/Calcutta", type: "Hygiene cleaning", location: "Lumen Dental Care — Central" },
   { id: "ap_5", contactId: "p_16", contactName: "Marcus Bélanger", title: "Recall — implant check", startAt: at(4, 10, 0), endAt: at(4, 11, 0), status: "confirmed", source: "phone", assigneeId: "u_priya", channel: "phone", timezone: "Asia/Calcutta", type: "Existing-patient exam", location: "Lumen Dental Care — Central" },
-  { id: "ap_6", contactId: "p_19", contactName: "Leila Ahmed", title: "Invisalign consultation", startAt: at(6, 11, 0), endAt: at(6, 12, 0), status: "scheduled", source: "phone", assigneeId: "u_dr_chen", channel: "phone", timezone: "Asia/Calcutta", type: "Invisalign consultation", location: "Lumen Dental Care — Riverside" },
-  { id: "ap_7", contactId: "p_20", contactName: "Rahul Verma", title: "Post-operative review", startAt: at(2, 16, 0), endAt: at(2, 16, 20), status: "scheduled", source: "whatsapp", assigneeId: "u_dr_kapoor", channel: "whatsapp", timezone: "Asia/Calcutta", type: "Post-op review", location: "Lumen Dental Care — Central" },
-  { id: "ap_8", contactId: "p_17", contactName: "Saanvi Patel", title: "Recall — hygiene", startAt: at(7, 17, 0), endAt: at(7, 18, 0), status: "scheduled", source: "phone", assigneeId: "u_hyg_sara", channel: "phone", timezone: "Asia/Calcutta", type: "Hygiene cleaning", location: "Lumen Dental Care — North" },
+  { id: "ap_6", contactId: "p_19", contactName: "Leila Ahmed", title: "Invisalign consultation", startAt: at(6, 11, 0), endAt: at(6, 12, 0), status: "requested", source: "phone", assigneeId: "u_dr_chen", channel: "phone", timezone: "Asia/Calcutta", type: "Invisalign consultation", location: "Lumen Dental Care — Riverside" },
+  { id: "ap_7", contactId: "p_20", contactName: "Rahul Verma", title: "Post-operative review", startAt: at(2, 16, 0), endAt: at(2, 16, 20), status: "requested", source: "whatsapp", assigneeId: "u_dr_kapoor", channel: "whatsapp", timezone: "Asia/Calcutta", type: "Post-op review", location: "Lumen Dental Care — Central" },
+  { id: "ap_8", contactId: "p_17", contactName: "Saanvi Patel", title: "Recall — hygiene", startAt: at(7, 17, 0), endAt: at(7, 18, 0), status: "requested", source: "phone", assigneeId: "u_hyg_sara", channel: "phone", timezone: "Asia/Calcutta", type: "Hygiene cleaning", location: "Lumen Dental Care — North" },
 ];
 
 // ─── Recall cases ──────────────────────────────────────────────────────────────
@@ -421,7 +460,7 @@ export interface WaitlistEntry {
   availability: string;
   contactPreference: ChannelId;
   lastOutreach: string | null;
-  acceptanceState: "waiting" | "invited" | "accepted" | "declined";
+  acceptanceState: "waiting" | "invited" | "accepted" | "declined" | "filled";
   matchReason: string;
 }
 

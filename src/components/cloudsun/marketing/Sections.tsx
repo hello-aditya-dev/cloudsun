@@ -162,7 +162,7 @@ export function AICapabilities() {
         <Reveal className="max-w-3xl">
           <SectionLabel>AI front desk</SectionLabel>
           <SectionHeading>
-            A receptionist that never tires, never misses a lead, and always asks before promising.
+            A dental front desk that handles routine enquiries, screens for emergencies, and always asks before promising.
           </SectionHeading>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground text-pretty">
             CloudSun&apos;s AI agent — call it Sunny or anything you like — does the repetitive work,
@@ -207,7 +207,7 @@ export function PhoneExperience() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 animate-pulse rounded-full bg-[oklch(0.62_0.16_42)]" />
-                  <span className="text-sm font-medium">Live call · 3:04</span>
+                  <span className="text-sm font-medium">Simulated call · 3:04</span>
                 </div>
                 <Badge variant="outline" className="text-[10px]">Recording · consent given</Badge>
               </div>
