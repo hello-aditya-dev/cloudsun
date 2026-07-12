@@ -225,7 +225,7 @@ export const demoWorkspace = new DemoWorkspaceRepositoryImpl();
 
 // ─── Recall, Waitlist, Treatment Follow-up repositories ──────────────────────
 
-import type { RecallCase, WaitlistEntry, TreatmentFollowUp } from "@/data/demo";
+import type { RecallCase, WaitlistEntry, TreatmentFollowUp, OpenSlot } from "@/data/demo";
 // Appointment already imported at top of file
 
 // ─── Expanded AppointmentRepository ─────────────────────────────────────────
@@ -292,15 +292,17 @@ class DemoAppointmentRepositoryImpl implements AppointmentRepository {
     this.update(id, { status: "cancelled" });
     demoAudit.add({ id: `al_${Date.now()}`, actor: "System", actorType: "system", action: "Cancelled appointment", resource: `Appointment ${id}`, at: new Date().toISOString(), ip: "internal", result: "success", details: reason });
   }
-  checkConflict(data: { startAt: string; endAtId?: string; assigneeId?: string }): Appointment | undefined {
-    const start = new Date(data.startAt).getTime();
+  checkConflict(data: { startAt: string; endAt: string; assigneeId?: string; excludeAppointmentId?: string }): Appointment | undefined {
+    const newStart = new Date(data.startAt).getTime();
+    const newEnd = new Date(data.endAt).getTime();
     const appts = getDemoState().appointments;
     return appts.find((a) => {
+      if (a.id === data.excludeAppointmentId) return false;
       if (a.status === "cancelled") return false;
-      if (data.assigneeId && a.assigneeId !== data.assigneeId) return false;
-      const aStart = new Date(a.startAt).getTime();
-      const aEnd = new Date(a.endAt).getTime();
-      return start >= aStart && start < aEnd;
+      if (data.assigneeId && a.assigneeId && a.assigneeId !== data.assigneeId) return false;
+      const existingStart = new Date(a.startAt).getTime();
+      const existingEnd = new Date(a.endAt).getTime();
+      return newStart < existingEnd && newEnd > existingStart;
     });
   }
   listByLocation(locationId: string) {
@@ -314,21 +316,49 @@ class DemoAppointmentRepositoryImpl implements AppointmentRepository {
   }
 }
 
-// ─── OpenSlot type for cancellation recovery ────────────────────────────────
+// ─── OpenSlotRepository ──────────────────────────────────────────────────────
 
-export interface OpenSlot {
-  id: string;
-  date: string;
-  time: string;
-  duration: number;
-  locationId: string;
-  locationName: string;
-  providerId: string;
-  providerName: string;
-  appointmentType: string;
-  estimatedValue: number;
-  status: "open" | "filled" | "expired";
-  sourceCancellationId?: string;
+export interface OpenSlotRepository {
+  list(): OpenSlot[];
+  getById(id: string): OpenSlot | undefined;
+  create(slot: Partial<OpenSlot>): OpenSlot;
+  update(id: string, patch: Partial<OpenSlot>): void;
+  markFilled(id: string, appointmentId: string, waitlistEntryId: string): void;
+  expire(id: string): void;
+}
+
+class DemoOpenSlotRepository implements OpenSlotRepository {
+  list() { return getDemoState().openSlots; }
+  getById(id: string) { return getDemoState().openSlots.find((s) => s.id === id); }
+  create(slot: Partial<OpenSlot>): OpenSlot {
+    const id = `os_${Date.now()}`;
+    const newSlot: OpenSlot = {
+      id,
+      date: slot.date ?? new Date().toISOString().split("T")[0],
+      time: slot.time ?? "09:00",
+      duration: slot.duration ?? 30,
+      locationId: slot.locationId ?? "loc_central",
+      locationName: slot.locationName ?? "Central",
+      providerId: slot.providerId ?? "u_priya",
+      providerName: slot.providerName ?? "Dr. Priya Sharma",
+      appointmentType: slot.appointmentType ?? "Consultation",
+      estimatedValue: slot.estimatedValue ?? 100,
+      status: "open",
+      sourceCancellationId: slot.sourceCancellationId,
+    };
+    setDemoState((s) => ({ ...s, openSlots: [...s.openSlots, newSlot] }));
+    return newSlot;
+  }
+  update(id: string, patch: Partial<OpenSlot>) {
+    setDemoState((s) => ({
+      ...s,
+      openSlots: s.openSlots.map((o) => (o.id === id ? { ...o, ...patch } : o)),
+    }));
+  }
+  markFilled(id: string, appointmentId: string, waitlistEntryId: string) {
+    this.update(id, { status: "filled", linkedAppointmentId: appointmentId, filledByWaitlistEntryId: waitlistEntryId, filledAt: new Date().toISOString() });
+  }
+  expire(id: string) { this.update(id, { status: "expired" }); }
 }
 
 // ─── RecallRepository ────────────────────────────────────────────────────────
@@ -481,10 +511,17 @@ class DemoWaitlistRepository implements WaitlistRepository {
     }).sort((a, b) => (b as any)._score - (a as any)._score) as WaitlistEntry[];
   }
   invite(id: string, openSlotId: string) {
-    this.update(id, { acceptanceState: "invited", lastOutreach: new Date().toISOString() });
+    this.update(id, { acceptanceState: "invited", openSlotId, invitedAt: new Date().toISOString(), lastOutreach: new Date().toISOString(), invitationStoppedAt: undefined });
     demoAudit.add({ id: `al_${Date.now()}`, actor: "System", actorType: "system", action: "Waitlist invitation sent (simulated)", resource: `WaitlistEntry ${id} for slot ${openSlotId}`, at: new Date().toISOString(), ip: "internal", result: "success", details: "Simulated invitation. No real patient contacted." });
   }
   accept(id: string, openSlotId: string) {
+    const entry = this.getById(id);
+    if (!entry) return;
+    // Validate entry belongs to this slot
+    if (entry.openSlotId !== openSlotId) return;
+    // Don't accept if slot already filled
+    const slot = demoOpenSlots.getById(openSlotId);
+    if (slot && slot.status === "filled") return;
     this.update(id, { acceptanceState: "accepted" });
     demoAudit.add({ id: `al_${Date.now()}`, actor: "CloudSun AI", actorType: "ai", action: "Waitlist invitation accepted (simulated)", resource: `WaitlistEntry ${id} for slot ${openSlotId}`, at: new Date().toISOString(), ip: "ai-worker", result: "success" });
   }
@@ -496,6 +533,12 @@ class DemoWaitlistRepository implements WaitlistRepository {
     const entry = this.getById(id);
     if (!entry) return null;
     if (entry.acceptanceState !== "accepted") return null;
+    // Validate slot exists and is open
+    const slot = demoOpenSlots.getById(openSlot.id);
+    if (!slot) return null;
+    if (slot.status !== "open") return null;
+    // Validate entry belongs to this slot
+    if (entry.openSlotId !== openSlot.id) return null;
 
     // 1. Create a real appointment through the appointment repository
     const appointment = demoAppointments.create({
@@ -519,10 +562,13 @@ class DemoWaitlistRepository implements WaitlistRepository {
       confirmationStatus: "confirmed",
     });
 
-    // 2. Mark the waitlist entry as filled
-    this.update(id, { acceptanceState: "filled" });
+    // 2. Mark the waitlist entry as filled and link appointment
+    this.update(id, { acceptanceState: "filled", linkedAppointmentId: appointment.id });
 
-    // 3. Stop other active invitations for that slot
+    // 3. Mark the open slot as filled
+    demoOpenSlots.markFilled(openSlot.id, appointment.id, id);
+
+    // 4. Stop other active invitations for ONLY that slot
     this.stopRemainingInvitations(openSlot.id, id);
 
     // 4. Update related patient status
@@ -539,18 +585,23 @@ class DemoWaitlistRepository implements WaitlistRepository {
   }
   stopRemainingInvitations(openSlotId: string, acceptedEntryId: string) {
     const state = getDemoState();
-    const invited = state.waitlist.filter((w) => w.acceptanceState === "invited" && w.id !== acceptedEntryId);
+    // Only stop invitations for the SAME slot, not all invited entries
+    const invited = state.waitlist.filter((w) =>
+      w.openSlotId === openSlotId &&
+      w.id !== acceptedEntryId &&
+      w.acceptanceState === "invited"
+    );
     if (invited.length === 0) return;
     setDemoState((s) => ({
       ...s,
       waitlist: s.waitlist.map((w) => {
-        if (w.acceptanceState === "invited" && w.id !== acceptedEntryId) {
-          return { ...w, acceptanceState: "waiting" }; // Reset to waiting — invitation no longer active
+        if (w.openSlotId === openSlotId && w.id !== acceptedEntryId && w.acceptanceState === "invited") {
+          return { ...w, acceptanceState: "waiting", openSlotId: undefined, invitationStoppedAt: new Date().toISOString() };
         }
         return w;
       }),
     }));
-    demoAudit.add({ id: `al_${Date.now()}`, actor: "System", actorType: "system", action: "Stopped remaining waitlist invitations", resource: `OpenSlot ${openSlotId}`, at: new Date().toISOString(), ip: "internal", result: "success", details: `${invited.length} invitation(s) stopped.` });
+    demoAudit.add({ id: `al_${Date.now()}`, actor: "System", actorType: "system", action: "Stopped remaining waitlist invitations for slot", resource: `OpenSlot ${openSlotId}`, at: new Date().toISOString(), ip: "internal", result: "success", details: `${invited.length} invitation(s) stopped for this slot only.` });
   }
 }
 
@@ -601,10 +652,11 @@ class DemoTreatmentFollowUpRepository implements TreatmentFollowUpRepository {
   sendSimulatedFollowUp(id: string): { success: boolean; reason?: string } {
     const tf = this.getById(id);
     if (!tf) return { success: false, reason: "Follow-up not found" };
-    // Check patient consent
     const patient = getDemoState().contacts.find((c) => c.id === tf.patientId);
-    if (patient && patient.consent.marketing === false && patient.treatmentFollowUpStatus === "declined") return { success: false, reason: "Patient has not given consent" };
-    if (patient && patient.treatmentFollowUpStatus === "closed") return { success: false, reason: "Follow-up is closed" };
+    if (!patient) return { success: false, reason: "Patient not found" };
+    if (!patient.consent.marketing) return { success: false, reason: "Patient has not given communication consent" };
+    if (patient.treatmentFollowUpStatus === "declined" || patient.treatmentFollowUpStatus === "closed") return { success: false, reason: "Treatment follow-up is closed" };
+    if (patient.recallStatus === "do_not_contact") return { success: false, reason: "Patient is marked do not contact" };
     this.update(id, { stage: "first_message", lastContact: new Date().toISOString(), nextAction: "Awaiting response" });
     demoAudit.add({ id: `al_${Date.now()}`, actor: "CloudSun AI", actorType: "ai", action: "Sent treatment follow-up (simulated)", resource: `TreatmentFollowUp ${id}`, at: new Date().toISOString(), ip: "ai-worker", result: "success", details: "Simulated outreach. No real patient contacted." });
     return { success: true };
@@ -641,6 +693,7 @@ class DemoTreatmentFollowUpRepository implements TreatmentFollowUpRepository {
 // ─── Export singletons ──────────────────────────────────────────────────────
 
 export const demoAppointments = new DemoAppointmentRepositoryImpl();
+export const demoOpenSlots = new DemoOpenSlotRepository();
 export const demoRecall = new DemoRecallRepository();
 export const demoWaitlist = new DemoWaitlistRepository();
 export const demoTreatmentFollowUp = new DemoTreatmentFollowUpRepository();

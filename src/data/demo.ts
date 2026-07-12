@@ -462,6 +462,11 @@ export interface WaitlistEntry {
   lastOutreach: string | null;
   acceptanceState: "waiting" | "invited" | "accepted" | "declined" | "filled";
   matchReason: string;
+  openSlotId?: string;
+  invitationGroupId?: string;
+  invitedAt?: string;
+  invitationStoppedAt?: string;
+  linkedAppointmentId?: string;
 }
 
 export const waitlistEntries: WaitlistEntry[] = [
@@ -475,6 +480,32 @@ export const waitlistEntries: WaitlistEntry[] = [
   { id: "wl_8", patientId: "p_36", patientName: "Jordan Lee", preferredLocation: "Central", preferredProvider: "Any", appointmentType: "Consultation", availability: "Evenings", contactPreference: "webchat", lastOutreach: daysAgo(1), acceptanceState: "invited", matchReason: "Same location" },
   { id: "wl_9", patientId: "p_40", patientName: "Grace Mathew", preferredLocation: "Central", preferredProvider: "Sara Thomas", appointmentType: "Hygiene cleaning", availability: "Any", contactPreference: "phone", lastOutreach: null, acceptanceState: "waiting", matchReason: "Preferred hygienist" },
   { id: "wl_10", patientId: "p_42", patientName: "Lakshmi Iyer", preferredLocation: "Riverside", preferredProvider: "Dr. Priya Sharma", appointmentType: "Check-up", availability: "Mornings", contactPreference: "phone", lastOutreach: daysAgo(2), acceptanceState: "accepted", matchReason: "Same provider" },
+];
+
+// ─── Open cancellation slots ────────────────────────────────────────────────
+
+export interface OpenSlot {
+  id: string;
+  date: string;
+  time: string;
+  duration: number;
+  locationId: string;
+  locationName: string;
+  providerId: string;
+  providerName: string;
+  appointmentType: string;
+  estimatedValue: number;
+  status: "open" | "filled" | "expired";
+  sourceCancellationId?: string;
+  linkedAppointmentId?: string;
+  filledByWaitlistEntryId?: string;
+  filledAt?: string;
+}
+
+export const openSlots: OpenSlot[] = [
+  { id: "os_1", date: "2026-07-13", time: "10:00", duration: 60, locationId: "loc_central", locationName: "Central", providerId: "u_priya", providerName: "Dr. Priya Sharma", appointmentType: "Hygiene cleaning", estimatedValue: 95, status: "open", sourceCancellationId: "ap_2" },
+  { id: "os_2", date: "2026-07-14", time: "14:00", duration: 45, locationId: "loc_north", locationName: "North", providerId: "u_dr_chen", providerName: "Dr. Mei Chen", appointmentType: "Consultation", estimatedValue: 150, status: "open" },
+  { id: "os_3", date: "2026-07-15", time: "09:00", duration: 30, locationId: "loc_riverside", locationName: "Riverside", providerId: "u_dr_kapoor", providerName: "Dr. Anil Kapoor", appointmentType: "Emergency examination", estimatedValue: 120, status: "open" },
 ];
 
 // ─── Treatment follow-up cases ─────────────────────────────────────────────────

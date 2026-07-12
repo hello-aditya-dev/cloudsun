@@ -17,11 +17,11 @@ import type {
 import {
   analytics, appointments, auditLog, automations, calls, contacts,
   conversations, integrations, knowledgeSources, messagesByConversation, team,
-  recallCases, waitlistEntries, treatmentFollowUps,
-  type RecallCase, type WaitlistEntry, type TreatmentFollowUp,
+  recallCases, waitlistEntries, treatmentFollowUps, openSlots,
+  type RecallCase, type WaitlistEntry, type TreatmentFollowUp, type OpenSlot,
 } from "@/data/demo";
 
-const STORAGE_KEY = "cloudsun.demo.dental.v2";
+const STORAGE_KEY = "cloudsun.demo.dental.v3";
 
 export interface DemoState {
   conversations: Conversation[];
@@ -39,6 +39,7 @@ export interface DemoState {
   recallCases: RecallCase[];
   waitlist: WaitlistEntry[];
   treatmentFollowUps: TreatmentFollowUp[];
+  openSlots: OpenSlot[];
 }
 
 export interface AIConfigState {
@@ -106,6 +107,7 @@ function freshState(): DemoState {
     recallCases: structuredClone(recallCases),
     waitlist: structuredClone(waitlistEntries),
     treatmentFollowUps: structuredClone(treatmentFollowUps),
+    openSlots: structuredClone(openSlots),
   };
 }
 
