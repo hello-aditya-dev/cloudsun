@@ -45,7 +45,7 @@ export function CallsSection() {
     <SectionScroll>
       <PageHeader
         title="Calls"
-        subtitle="Live calls, recordings, transcripts and after-call summaries."
+        subtitle="Simulated calls, transcripts and after-call summaries."
         action={
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setView("list")} className={view === "list" ? "bg-muted" : ""}>
@@ -56,7 +56,7 @@ export function CallsSection() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[oklch(0.62_0.16_42)] opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[oklch(0.62_0.16_42)]" />
               </span>
-              Live call
+              Simulated call
             </Button>
           </div>
         }

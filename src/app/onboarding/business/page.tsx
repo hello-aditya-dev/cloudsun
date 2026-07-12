@@ -13,7 +13,7 @@ export default function OnboardingBusinessPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label className="text-xs">Business name</Label>
-              <Input defaultValue="Atelier North" className="mt-1" />
+              <Input defaultValue="Lumen Dental Care" className="mt-1" />
             </div>
             <div>
               <Label className="text-xs">Industry</Label>
@@ -23,7 +23,7 @@ export default function OnboardingBusinessPage() {
                   <SelectItem value="professional">Professional services</SelectItem>
                   <SelectItem value="health">Health & wellness</SelectItem>
                   <SelectItem value="clinic">Clinic / dental</SelectItem>
-                  <SelectItem value="salon">Salon & spa</SelectItem>
+                  <SelectItem value="orthodontic">Orthodontic practice</SelectItem>
                   <SelectItem value="legal">Legal</SelectItem>
                   <SelectItem value="finance">Finance & tax</SelectItem>
                   <SelectItem value="other">Other</SelectItem>

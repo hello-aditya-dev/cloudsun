@@ -62,7 +62,7 @@ export function MarketingHeader() {
           <Link href="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
           <m.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
             <Link href="/signup">
-              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">Start building</Button>
+              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">Start a controlled pilot</Button>
             </Link>
           </m.div>
         </div>
@@ -128,7 +128,7 @@ export function MarketingHeader() {
                   transition={{ delay: 0.3, duration: motionDuration.standard }}
                 >
                   <Link href="/login" className="flex-1"><Button variant="outline" size="sm" className="w-full">Sign in</Button></Link>
-                  <Link href="/signup" className="flex-1"><Button size="sm" className="w-full bg-primary text-primary-foreground">Start building</Button></Link>
+                  <Link href="/signup" className="flex-1"><Button size="sm" className="w-full bg-primary text-primary-foreground">Start a controlled pilot</Button></Link>
                 </m.div>
               </div>
             </m.div>

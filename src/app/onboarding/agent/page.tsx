@@ -48,7 +48,7 @@ export default function OnboardingAgentPage() {
           </div>
           <div>
             <Label className="text-xs">Greeting</Label>
-            <Textarea className="mt-1" defaultValue="Thank you for calling Atelier North, this is Sunny. How can I help you today?" />
+            <Textarea className="mt-1" defaultValue="Thank you for calling Lumen Dental Care, this is Sunny. How can I help you today?" />
           </div>
           <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 p-3">
             <div className="text-xs">

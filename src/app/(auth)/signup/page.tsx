@@ -17,13 +17,13 @@ export default function SignupPage() {
           <Card className="border-border bg-card shadow-lift">
             <CardContent className="space-y-4 p-6">
               <div>
-                <h1 className="font-serif text-2xl">Start building</h1>
+                <h1 className="font-serif text-2xl">Start a controlled pilot</h1>
                 <p className="mt-1 text-sm text-muted-foreground">Authentication is in demonstration mode. No real account is created.</p>
               </div>
               <div className="space-y-3">
                 <div>
                   <Label className="text-xs">Business name</Label>
-                  <Input placeholder="Atelier North" className="mt-1" />
+                  <Input placeholder="Lumen Dental Care" className="mt-1" />
                 </div>
                 <div>
                   <Label className="text-xs">Email</Label>
