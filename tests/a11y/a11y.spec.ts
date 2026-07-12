@@ -32,7 +32,7 @@ test.describe("Accessibility — Inbox", () => {
   test("has no serious axe violations", async ({ page }) => {
     await page.goto("/app/inbox");
     await page.waitForLoadState("networkidle");
-    const results = await AxeBuilder({ page })
+    const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa"])
       .analyze();
     const serious = results.violations.filter(
