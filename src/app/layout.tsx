@@ -40,6 +40,7 @@ export const metadata: Metadata = {
       "Fill your schedule without adding more pressure to your front desk. Handles new-patient enquiries, appointments, cancellations, recalls and treatment follow-up.",
     siteName: "CloudSun Dental",
     type: "website",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "CloudSun" }],
   },
   twitter: {
     card: "summary_large_image",
